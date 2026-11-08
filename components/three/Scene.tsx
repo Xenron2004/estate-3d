@@ -15,6 +15,7 @@ import StreetFurniture from './StreetFurniture';
 import AmenityHotspots from './AmenityHotspots';
 import HousePreview from './HousePreview';
 import CameraRig from './CameraRig';
+import ApartmentSociety from './ApartmentSociety';
 import type { Plot } from '@/lib/types';
 
 function Exposure({ value }: { value: number }) {
@@ -92,6 +93,7 @@ export default function Scene({
       <SiteGround quality={quality} />
       <Roads3D quality={quality} />
       <Parcels onHover={onHover} />
+      <ApartmentSociety />
       <Structures quality={quality} />
       <Planting quality={quality} />
       <StreetFurniture quality={quality} timeOfDay={timeOfDay} />

@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { Pause, Play, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
 import PlanPlaceholder from '@/components/ui/PlanPlaceholder';
 import Reveal from '@/components/ui/Reveal';
 import SectionHeading from '@/components/ui/SectionHeading';
@@ -13,7 +14,7 @@ import InventoryList from '@/components/explorer/InventoryList';
 import Legend from '@/components/explorer/Legend';
 import HousePreviewControl from '@/components/explorer/HousePreviewControl';
 import AmenityList from '@/components/explorer/AmenityList';
-import { useExplorerStore } from '@/lib/store';
+import { useExplorerStore, type PanDirection } from '@/lib/store';
 import { subscribeWalk, walkRuntime } from '@/lib/walk-runtime';
 
 const TownshipCanvas = dynamic(() => import('@/components/three/TownshipCanvas'), {
@@ -64,6 +65,40 @@ function WalkControls() {
       >
         <X size={14} aria-hidden="true" />
       </button>
+    </div>
+  );
+}
+
+function DirectionalControls() {
+  const cameraMode = useExplorerStore((state) => state.cameraMode);
+  const panCamera = useExplorerStore((state) => state.panCamera);
+  const directions: { direction: PanDirection; label: string; icon: typeof ArrowUp; position: string }[] = [
+    { direction: 'up', label: 'Pan up', icon: ArrowUp, position: 'col-start-2 row-start-1' },
+    { direction: 'left', label: 'Pan left', icon: ArrowLeft, position: 'col-start-1 row-start-2' },
+    { direction: 'down', label: 'Pan down', icon: ArrowDown, position: 'col-start-2 row-start-2' },
+    { direction: 'right', label: 'Pan right', icon: ArrowRight, position: 'col-start-3 row-start-2' },
+  ];
+
+  if (cameraMode === 'walk') return null;
+
+  return (
+    <div
+      role="group"
+      aria-label="Move around the plot"
+      className="pointer-events-auto absolute bottom-3 right-3 z-10 grid grid-cols-3 grid-rows-2 gap-1 rounded-sm border border-ink/15 bg-bone/90 p-1.5 shadow-sm backdrop-blur-md"
+    >
+      {directions.map(({ direction, label, icon: Icon, position }) => (
+        <button
+          key={direction}
+          type="button"
+          onClick={() => panCamera(direction)}
+          aria-label={label}
+          title={label}
+          className={`flex h-9 w-9 items-center justify-center rounded-[2px] text-ink/70 transition-colors hover:bg-ink hover:text-bone focus-visible:bg-ink focus-visible:text-bone ${position}`}
+        >
+          <Icon size={16} aria-hidden="true" />
+        </button>
+      ))}
     </div>
   );
 }
@@ -168,6 +203,7 @@ export default function MasterPlan() {
                 <Legend />
               </div>
 
+              <DirectionalControls />
               <WalkControls />
             </div>
 

@@ -3,7 +3,7 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useExplorerStore } from '@/lib/store';
+import { useExplorerStore, type PanDirection } from '@/lib/store';
 import { SITE, WALKTHROUGH_POINTS } from '@/lib/data/township';
 import { setWalkT, walkRuntime } from '@/lib/walk-runtime';
 import { CAMERA_PRESETS } from '@/lib/camera';
@@ -25,6 +25,7 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
   const desiredTarget = useRef(new THREE.Vector3(...CAMERA_PRESETS.home.target));
   const transitioning = useRef(true);
   const lastRequestId = useRef(0);
+  const lastPanRequestId = useRef(0);
   const introElapsed = useRef(0);
   const introActive = useRef(true);
   const lastWalkNotify = useRef(0);
@@ -104,6 +105,48 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
         desiredTarget.current.set(...request.target);
         transitioning.current = true;
       }
+    }
+
+    const panRequest = store.panRequest;
+    if (
+      variant === 'explorer' &&
+      store.cameraMode !== 'walk' &&
+      panRequest &&
+      panRequest.id !== lastPanRequestId.current
+    ) {
+      lastPanRequestId.current = panRequest.id;
+      const direction = new THREE.Vector3();
+      if (panRequest.direction === 'up' || panRequest.direction === 'down') {
+        camera.getWorldDirection(direction);
+        direction.y = 0;
+        direction.normalize();
+      } else {
+        direction.set(1, 0, 0).applyQuaternion(camera.quaternion);
+        direction.y = 0;
+        direction.normalize();
+      }
+
+      const sign = panRequest.direction === 'up' || panRequest.direction === 'right' ? 1 : -1;
+      direction.multiplyScalar(sign * 18);
+      const nextX = THREE.MathUtils.clamp(
+        controls.target.x + direction.x,
+        SITE.minX - 70,
+        SITE.maxX + 70,
+      );
+      const nextZ = THREE.MathUtils.clamp(
+        controls.target.z + direction.z,
+        SITE.minZ - 70,
+        SITE.maxZ + 70,
+      );
+      const offset = new THREE.Vector3(nextX - controls.target.x, 0, nextZ - controls.target.z);
+
+      camera.position.add(offset);
+      controls.target.add(offset);
+      desiredPosition.current.add(offset);
+      desiredTarget.current.add(offset);
+      controls.update();
+    } else if (panRequest && panRequest.id !== lastPanRequestId.current && store.cameraMode === 'walk') {
+      lastPanRequestId.current = panRequest.id;
     }
 
     if (store.cameraMode === 'walk') {

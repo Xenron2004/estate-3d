@@ -35,6 +35,8 @@ export const DEFAULT_FILTERS: Filters = {
   query: '',
 };
 
+export type PanDirection = 'up' | 'down' | 'left' | 'right';
+
 function normaliseQuery(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -71,6 +73,11 @@ interface CameraRequest {
   mode: CameraMode;
 }
 
+interface PanRequest {
+  id: number;
+  direction: PanDirection;
+}
+
 interface ExplorerState {
   plots: Plot[];
   dataStatus: 'idle' | 'loading' | 'ready' | 'error';
@@ -81,6 +88,7 @@ interface ExplorerState {
   hoveredId: string | null;
   cameraMode: CameraMode;
   cameraRequest: CameraRequest | null;
+  panRequest: PanRequest | null;
   timeOfDay: TimeOfDay;
   previousTimeOfDay: TimeOfDay | null;
   labelsVisible: boolean;
@@ -104,6 +112,7 @@ interface ExplorerState {
     target: [number, number, number],
     mode?: CameraMode,
   ) => void;
+  panCamera: (direction: PanDirection) => void;
   focusPlot: (id: string) => void;
   focusAmenity: (id: string) => void;
   setTimeOfDay: (time: TimeOfDay) => void;
@@ -117,6 +126,7 @@ interface ExplorerState {
 }
 
 let requestCounter = 0;
+let panRequestCounter = 0;
 
 export const useExplorerStore = create<ExplorerState>((set, get) => ({
   plots: CANONICAL_PLOTS,
@@ -133,6 +143,7 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
     target: CAMERA_PRESETS.home.target,
     mode: 'aerial',
   },
+  panRequest: null,
   timeOfDay: 'day',
   previousTimeOfDay: null,
   labelsVisible: false,
@@ -217,6 +228,8 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
       cameraMode: mode ?? state.cameraMode,
       cameraRequest: { id: ++requestCounter, position, target, mode: mode ?? state.cameraMode },
     })),
+
+  panCamera: (direction) => set({ panRequest: { id: ++panRequestCounter, direction } }),
 
   focusPlot: (id) => {
     const { plots } = get();

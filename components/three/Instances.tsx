@@ -16,6 +16,7 @@ interface Props {
   items: InstanceDef[];
   castShadow?: boolean;
   receiveShadow?: boolean;
+  interactive?: boolean;
 }
 
 export default function Instances({
@@ -24,6 +25,7 @@ export default function Instances({
   items,
   castShadow = false,
   receiveShadow = false,
+  interactive = true,
 }: Props) {
   const ref = useRef<THREE.InstancedMesh>(null);
 
@@ -59,6 +61,7 @@ export default function Instances({
       args={[geometry, material, Math.max(items.length, 1)]}
       castShadow={castShadow}
       receiveShadow={receiveShadow}
+      raycast={interactive ? undefined : () => {}}
       frustumCulled={false}
     />
   );
