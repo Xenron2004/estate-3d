@@ -1,0 +1,161 @@
+'use client';
+
+import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
+import { useExplorerStore } from '@/lib/store';
+import { SITE, WALKTHROUGH_POINTS } from '@/lib/data/township';
+import { setWalkT, walkRuntime } from '@/lib/walk-runtime';
+import { CAMERA_PRESETS } from '@/lib/camera';
+
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+interface Props {
+  variant?: 'hero' | 'explorer';
+  introDuration?: number;
+}
+
+export default function CameraRig({ variant = 'explorer', introDuration }: Props) {
+  const camera = useThree((state) => state.camera);
+  const controls = useThree((state) => state.controls) as
+    | (THREE.EventDispatcher & { target: THREE.Vector3; update: () => void })
+    | null;
+
+  const desiredPosition = useRef(new THREE.Vector3(...CAMERA_PRESETS.home.position));
+  const desiredTarget = useRef(new THREE.Vector3(...CAMERA_PRESETS.home.target));
+  const transitioning = useRef(true);
+  const lastRequestId = useRef(0);
+  const introElapsed = useRef(0);
+  const introActive = useRef(true);
+  const lastWalkNotify = useRef(0);
+  const driftOffset = useRef(new THREE.Vector3());
+  const upAxis = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+  const duration = introDuration ?? (variant === 'hero' ? 3 : 1.8);
+
+  const walkCurve = useMemo(    () =>
+      new THREE.CatmullRomCurve3(
+        WALKTHROUGH_POINTS.map((point) => new THREE.Vector3(point[0], point[1], point[2])),
+        true,
+        'catmullrom',
+        0.35,
+      ),
+    [],
+  );
+
+  const introPosition = useMemo(
+    () =>
+      new THREE.Vector3(
+        ...(variant === 'hero' ? CAMERA_PRESETS.introHero.position : CAMERA_PRESETS.introExplorer.position),
+      ),
+    [variant],
+  );
+  const introTarget = useMemo(
+    () =>
+      new THREE.Vector3(
+        ...(variant === 'hero' ? CAMERA_PRESETS.introHero.target : CAMERA_PRESETS.introExplorer.target),
+      ),
+    [variant],
+  );
+  const homePosition = useMemo(() => new THREE.Vector3(...CAMERA_PRESETS.home.position), []);
+  const homeTarget = useMemo(() => new THREE.Vector3(...CAMERA_PRESETS.home.target), []);
+
+  useEffect(() => {
+    camera.position.copy(introPosition);
+    if (controls) {
+      controls.target.copy(introTarget);
+      controls.update();
+    }
+  }, [camera, controls, introPosition, introTarget]);
+
+  useFrame((state, delta) => {
+    if (!controls) return;
+    const store = useExplorerStore.getState();
+
+    // A gallery capture needs the camera placed exactly, so it overrides both
+    // the cinematic reveal and the damping.
+    const capture = store.captureRequest;
+    if (capture) {
+      camera.position.set(...capture.preset.camera.position);
+      controls.target.set(...capture.preset.camera.target);
+      controls.update();
+      return;
+    }
+
+    if (introActive.current) {
+      introElapsed.current += delta;
+      const t = Math.min(1, introElapsed.current / duration);
+      const eased = easeInOutCubic(t);
+      camera.position.lerpVectors(introPosition, homePosition, eased);
+      camera.position.y += Math.sin(eased * Math.PI) * 34;
+      controls.target.lerpVectors(introTarget, homeTarget, eased);
+      controls.update();
+      if (t >= 1) introActive.current = false;
+      return;
+    }
+
+    const request = store.cameraRequest;
+    if (request && request.id !== lastRequestId.current) {
+      lastRequestId.current = request.id;
+      if (store.cameraMode === 'walk') {
+        walkRuntime.t = 0;
+        setWalkT(0);
+      } else {
+        desiredPosition.current.set(...request.position);
+        desiredTarget.current.set(...request.target);
+        transitioning.current = true;
+      }
+    }
+
+    if (store.cameraMode === 'walk') {
+      if (walkRuntime.playing) {
+        walkRuntime.t = (walkRuntime.t + delta * 0.0135) % 1;
+        if (state.clock.elapsedTime - lastWalkNotify.current > 0.12) {
+          lastWalkNotify.current = state.clock.elapsedTime;
+          setWalkT(walkRuntime.t);
+        }
+      }
+      const point = walkCurve.getPointAt(walkRuntime.t);
+      const lookAhead = walkCurve.getPointAt((walkRuntime.t + 0.011) % 1);
+      const follow = 1 - Math.pow(0.0006, delta);
+      camera.position.lerp(point, follow);
+      controls.target.lerp(lookAhead, follow);
+      controls.update();
+      return;
+    }
+
+    if (transitioning.current) {
+      const k = 1 - Math.pow(0.0018, delta);
+      camera.position.lerp(desiredPosition.current, k);
+      controls.target.lerp(desiredTarget.current, k);
+      if (
+        camera.position.distanceTo(desiredPosition.current) < 0.6 &&
+        controls.target.distanceTo(desiredTarget.current) < 0.6
+      ) {
+        transitioning.current = false;
+      }
+    } else if (variant === 'hero') {
+      // A slow, continuous drift keeps the hero frame alive without stealing
+      // attention from the headline.
+      driftOffset.current.copy(camera.position).sub(controls.target);
+      driftOffset.current.applyAxisAngle(upAxis, delta * 0.028);
+      camera.position.copy(controls.target).add(driftOffset.current);
+    }
+
+    // Keep the orbit target inside the development so the view can never be
+    // lost in the surrounding terrain.
+    const margin = 70;
+    controls.target.x = THREE.MathUtils.clamp(
+      controls.target.x,
+      SITE.minX - margin,
+      SITE.maxX + margin,
+    );
+    controls.target.z = THREE.MathUtils.clamp(
+      controls.target.z,
+      SITE.minZ - margin,
+      SITE.maxZ + margin,
+    );
+    controls.update();
+  });
+
+  return null;
+}

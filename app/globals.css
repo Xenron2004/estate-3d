@@ -1,0 +1,129 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #16211c;
+  --color-ink-soft: #2c3930;
+  --color-bone: #f5f0e7;
+  --color-bone-deep: #e9e1d2;
+  --color-sand: #ded2bb;
+  --color-bronze: #a8794a;
+  --color-bronze-soft: #c9a97b;
+  --color-moss: #5e7a4e;
+  --color-available: #4f7f52;
+  --color-booked: #b9822c;
+  --color-sold: #9c4a3c;
+
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bone);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv05';
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+  }
+
+  ::selection {
+    background: var(--color-bronze);
+    color: #fdfaf4;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-bronze);
+    outline-offset: 3px;
+  }
+
+  .stage-fullscreen:fullscreen {
+    height: 100vh !important;
+    width: 100vw !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+  }
+
+  .rule {
+    height: 1px;
+    width: 100%;
+    background: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .link-underline:hover {
+    background-size: 100% 1px;
+  }
+
+  .numeric {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .status-chip::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
