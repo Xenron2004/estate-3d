@@ -1,6 +1,6 @@
 'use client';
 
-import { Compass } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { AMENITIES } from '@/lib/data/amenities';
 import { useExplorerStore } from '@/lib/store';
 
@@ -10,33 +10,34 @@ export default function AmenityList() {
 
   return (
     <div>
-      <h3 className="eyebrow text-ink/55">Amenities in the model</h3>
-      <ul className="mt-3 divide-y divide-ink/10 border-y border-ink/10">
-        {AMENITIES.map((amenity) => (
-          <li key={amenity.id} className="flex items-start justify-between gap-4 py-3">
-            <div>
-              <div className="text-[13.5px] text-ink">{amenity.name}</div>
-              <div className="mt-0.5 text-[11.5px] leading-snug text-ink/50">{amenity.summary}</div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                focusAmenity(amenity.id);
-                document
-                  .getElementById('master-plan')
-                  ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className={`flex shrink-0 items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-[10.5px] uppercase tracking-[0.12em] transition-colors ${
-                activeAmenity === amenity.id
-                  ? 'border-ink bg-ink text-bone'
-                  : 'border-ink/15 text-ink/65 hover:border-ink hover:text-ink'
-              }`}
-            >
-              <Compass size={12} aria-hidden="true" />
-              Explore
-            </button>
-          </li>
-        ))}
+      <div className="flex items-baseline justify-between gap-4">
+        <h3 className="font-sans text-[13px] font-medium tracking-normal">Around the neighbourhood</h3>
+        <span className="numeric text-[11px] text-ink/70">{String(AMENITIES.length).padStart(2, '0')} places</span>
+      </div>
+      <ul className="mt-4 divide-y divide-ink/10 border-y border-ink/10">
+        {AMENITIES.map((amenity, index) => {
+          const active = activeAmenity === amenity.id;
+          return (
+            <li key={amenity.id}>
+              <button
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  focusAmenity(amenity.id);
+                  document.getElementById('master-plan')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                className={`group flex w-full items-start gap-3 rounded-xl px-2 py-4 text-left transition-colors ${active ? 'bg-lime/35' : 'hover:bg-white/65'}`}
+              >
+                <span className="numeric pt-1 text-[10px] text-ink/70">{String(index + 1).padStart(2, '0')}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[13px] font-medium text-ink">{amenity.name}</span>
+                  <span className="mt-1 block text-[11px] leading-relaxed text-ink/70">{amenity.summary}</span>
+                </span>
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${active ? 'bg-ink text-bone' : 'border border-ink/15 text-ink/70 group-hover:bg-ink group-hover:text-bone'}`}><ArrowUpRight size={14} aria-hidden="true" /></span>
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

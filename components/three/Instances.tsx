@@ -32,6 +32,7 @@ export default function Instances({
   useLayoutEffect(() => {
     const mesh = ref.current;
     if (!mesh) return;
+    mesh.count = items.length;
     const matrix = new THREE.Matrix4();
     const position = new THREE.Vector3();
     const quaternion = new THREE.Quaternion();

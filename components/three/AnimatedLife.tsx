@@ -5,23 +5,9 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ROADS } from '@/lib/data/township';
+import { createParkTrail } from '@/lib/three/park-trail';
 
-const PARK_TRAIL = new THREE.CatmullRomCurve3(
-  [
-    [-26, 0.09, 126],
-    [-31, 0.09, 146],
-    [-23, 0.09, 164],
-    [-4, 0.09, 176],
-    [16, 0.09, 174],
-    [29, 0.09, 160],
-    [28, 0.09, 146],
-    [19, 0.09, 132],
-    [-4, 0.09, 123],
-  ].map(([x, y, z]) => new THREE.Vector3(x, y, z)),
-  true,
-  'catmullrom',
-  0.35,
-);
+const PARK_TRAIL = createParkTrail(0.09);
 
 const ROAD_LOOP = new THREE.CatmullRomCurve3(
   [

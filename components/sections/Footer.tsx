@@ -1,90 +1,47 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
+import { ArrowUpRight, ArrowUp } from 'lucide-react';
 import { BRAND } from '@/lib/data/township';
 
 const ANCHORS = [
-  { href: '#introduction', label: 'Introduction' },
-  { href: '#master-plan', label: 'Master plan' },
-  { href: '#highlights', label: 'Highlights' },
-  { href: '#amenities', label: 'Amenities' },
-  { href: '#plots', label: 'Plots' },
-  { href: '#location', label: 'Location' },
-  { href: '#plan-details', label: 'Plan details' },
-  { href: '#gallery', label: 'Gallery' },
-  { href: '#faq', label: 'FAQ' },
-  { href: '#contact', label: 'Enquire' },
+  { href: '#introduction', label: 'The vision' },
+  { href: '#master-plan', label: 'Explore in 3D' },
+  { href: '#amenities', label: 'Life at Aurelia' },
+  { href: '#plots', label: 'Find your plot' },
+  { href: '#location', label: 'The neighbourhood' },
+  { href: '#gallery', label: 'In perspective' },
 ];
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-bone/12 bg-ink px-5 py-16 text-bone sm:px-8">
-      <div className="mx-auto max-w-[1440px]">
-        <div className="grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <div className="font-display text-[26px] leading-none text-bone">Aurelia Estates</div>
-            <div className="eyebrow mt-3 text-bronze-soft">{BRAND.tagline}</div>
-            <p className="mt-6 max-w-[38ch] text-[13px] leading-relaxed text-bone/50">
-              A fictional planned township built as a design and engineering demonstration:
-              procedural 3D, a single canonical plot dataset, and an interface designed for
-              exploring land.
-            </p>
+    <footer className="overflow-hidden border-t border-bone/15 bg-ink text-bone">
+      <div className="site-shell pt-14 sm:pt-20">
+        <div className="grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <p className="eyebrow text-lime">A little more room for life.</p>
+            <p className="mt-5 max-w-[30ch] font-display text-[30px] leading-[1.25] tracking-[-0.025em] text-bone/90">Good ground.<br />Beautiful possibilities.</p>
           </div>
-
-          <div className="lg:col-span-3">
-            <h2 className="eyebrow text-bone/40">On this page</h2>
-            <ul className="mt-4 grid grid-cols-2 gap-y-2.5">
-              {ANCHORS.map((anchor) => (
-                <li key={anchor.href}>
-                  <a
-                    href={anchor.href}
-                    className="link-underline text-[13px] text-bone/60 transition-colors hover:text-bone"
-                  >
-                    {anchor.label}
-                  </a>
-                </li>
-              ))}
+          <div className="md:col-span-4">
+            <p className="eyebrow text-bone/65">Explore Aurelia</p>
+            <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-[12px] text-bone/75">
+              {ANCHORS.map((anchor) => <li key={anchor.href}><a href={anchor.href} className="link-underline transition-colors hover:text-lime">{anchor.label}</a></li>)}
             </ul>
           </div>
-
-          <div className="lg:col-span-2">
-            <h2 className="eyebrow text-bone/40">Contact</h2>
-            <ul className="mt-4 space-y-2.5 text-[13px] text-bone/60">
-              <li className="numeric">{BRAND.phone}</li>
-              <li>{BRAND.email}</li>
-              <li>Aurelia belt — illustrative</li>
-              <li className="numeric">+91 {BRAND.whatsapp.slice(2)}</li>
-            </ul>
-            <p className="mt-4 text-[11px] leading-relaxed text-bone/35">
-              All contact details are placeholders for this demonstration.
-            </p>
-          </div>
-
-          <div className="lg:col-span-3">
-            <h2 className="eyebrow text-bone/40">Legal & demo notice</h2>
-            <p className="mt-4 text-[11.5px] leading-relaxed text-bone/45">
-              Aurelia Estates is fictional. It is not a real project, and nothing on this site
-              constitutes an offer, invitation, price guarantee, planning approval, title, RERA
-              registration, ownership claim or statement of appreciation. Prices, availability,
-              geography, distances and amenities are illustrative. The 3D model is a design
-              representation and is not a legal survey.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-4 text-[12px] text-bone/55">
-              <Link href="/privacy" className="link-underline hover:text-bone">
-                Privacy notice (template)
-              </Link>
-              <Link href="/brochure" className="link-underline hover:text-bone">
-                Printable master plan
-              </Link>
-            </div>
+          <div className="md:col-span-3">
+            <p className="eyebrow text-bone/65">Say hello</p>
+            <a href="#contact" className="mt-5 inline-flex items-center gap-3 text-[15px] text-bone transition-colors hover:text-lime">Start a conversation <ArrowUpRight size={18} aria-hidden="true" /></a>
+            <p className="mt-3 text-[12px] text-bone/60">{BRAND.email}</p>
+            <p className="mt-2 text-[11px] text-bone/65">Contact details are illustrative.</p>
           </div>
         </div>
-
-        <div className="mt-14 flex flex-col gap-3 border-t border-bone/12 pt-6 text-[11px] text-bone/35 sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} Aurelia Estates — a fictional development.</span>
-          <span>
-            Designed and engineered as a demonstration. 3D built with Three.js / React Three Fiber;
-            motion with GSAP; dataset and UI by the Aurelia design team.
-          </span>
+        <div className="relative mt-16 flex items-end justify-between border-b border-bone/20 pb-6 sm:mt-24 sm:pb-10">
+          <div className="min-w-0"><p className="font-display text-[clamp(3.7rem,16vw,16rem)] leading-[0.8] tracking-[-0.075em]">Aurelia<span className="text-lime">.</span></p><p className="mt-6 text-[9px] uppercase tracking-[0.5em] text-bone/65 sm:mt-8 sm:text-[11px]">Estates / Your land. Your legacy.</p></div>
+          <a href="#top" aria-label="Back to top" className="mb-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-bone/30 text-bone transition-colors hover:border-lime hover:bg-lime hover:text-ink sm:h-16 sm:w-16"><ArrowUp size={20} strokeWidth={1.2} aria-hidden="true" /></a>
         </div>
+        <div className="flex flex-col justify-between gap-4 py-7 text-[11px] text-bone/65 md:flex-row">
+          <p>© {new Date().getFullYear()} Aurelia Estates. A design exploration.</p>
+          <div className="flex flex-wrap gap-6"><Link href="/privacy" className="link-underline hover:text-bone">Privacy notice</Link><Link href="/brochure" className="link-underline hover:text-bone">Printable master plan</Link><a href="#faq" className="link-underline hover:text-bone">Questions & answers</a></div>
+        </div>
+        <p className="max-w-[112ch] pb-8 text-[10px] leading-[1.7] text-bone/65">Aurelia Estates is a fictional development. Prices, availability, geography and amenities are illustrative. Nothing on this site is an offer, planning approval, title or ownership claim. The 3D model is a design representation, not a legal survey.</p>
       </div>
     </footer>
   );

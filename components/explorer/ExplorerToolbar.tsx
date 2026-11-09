@@ -10,9 +10,11 @@ import {
   Sun,
   Sunrise,
   Moon,
+  Building2,
 } from 'lucide-react';
 import { useExplorerStore } from '@/lib/store';
 import type { CameraMode, TimeOfDay } from '@/lib/types';
+import { CAMERA_PRESETS } from '@/lib/camera';
 
 const VIEWS: { id: CameraMode; label: string; icon: typeof Compass }[] = [
   { id: 'aerial', label: 'Aerial', icon: Compass },
@@ -26,6 +28,9 @@ const TIMES: { id: TimeOfDay; label: string; icon: typeof Sun }[] = [
   { id: 'golden', label: 'Golden', icon: Sunrise },
   { id: 'dusk', label: 'Dusk', icon: Moon },
 ];
+
+const groupClass = 'flex max-w-full flex-wrap items-center gap-1 rounded-[18px] border border-white/70 bg-bone/95 p-1.5 shadow-[0_6px_24px_-16px_rgba(22,44,37,0.3)]';
+const controlClass = 'flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[11px] transition-colors';
 
 export default function ExplorerToolbar({
   onFullscreen,
@@ -41,32 +46,28 @@ export default function ExplorerToolbar({
   const labelsVisible = useExplorerStore((state) => state.labelsVisible);
   const toggleLabels = useExplorerStore((state) => state.toggleLabels);
   const requestCamera = useExplorerStore((state) => state.requestCamera);
-  const selectedId = useExplorerStore((state) => state.selectedId);
-  const plots = useExplorerStore((state) => state.plots);
+  const focusAmenity = useExplorerStore((state) => state.focusAmenity);
+  const apartmentsActive = useExplorerStore((state) => state.activeAmenity === 'apartments');
 
   const reset = () => {
-    const plot = plots.find((item) => item.id === selectedId);
-    if (plot) {
-      requestCamera([82, 88, 272], [0, 0, 96], 'aerial');
-    } else {
-      requestCamera([82, 88, 272], [0, 0, 96], 'aerial');
-    }
+    requestCamera(CAMERA_PRESETS.home.position, CAMERA_PRESETS.home.target, 'aerial');
   };
 
   return (
-    <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-      <div className="flex items-center gap-1 rounded-sm border border-ink/12 bg-bone/92 p-1 backdrop-blur-md">
+    <div className="pointer-events-auto flex max-w-full flex-wrap items-center gap-2">
+      <div className={groupClass} role="group" aria-label="Camera views">
         {VIEWS.map((view) => {
           const Icon = view.icon;
-          const active = cameraMode === view.id;
+          const active = cameraMode === view.id && !apartmentsActive;
           return (
             <button
               key={view.id}
               type="button"
               onClick={() => setCameraMode(view.id)}
               aria-pressed={active}
-              className={`flex items-center gap-1.5 rounded-[2px] px-2.5 py-1.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors ${
-                active ? 'bg-ink text-bone' : 'text-ink/60 hover:text-ink'
+              aria-label={view.label}
+              className={`${controlClass} ${
+                active ? 'bg-ink text-bone' : 'text-ink/70 hover:bg-ink/5 hover:text-ink'
               }`}
             >
               <Icon size={13} aria-hidden="true" />
@@ -74,9 +75,20 @@ export default function ExplorerToolbar({
             </button>
           );
         })}
+        <button
+          type="button"
+          onClick={() => focusAmenity('apartments')}
+          aria-label="View five new apartment buildings"
+          aria-pressed={apartmentsActive}
+          title="View the new apartment district"
+          className={`${controlClass} ${apartmentsActive ? 'bg-ink text-bone' : 'text-ink/70 hover:bg-ink/5 hover:text-ink'}`}
+        >
+          <Building2 size={13} aria-hidden="true" />
+          <span className="hidden sm:inline">Apartments</span>
+        </button>
       </div>
 
-      <div className="flex items-center gap-1 rounded-sm border border-ink/12 bg-bone/92 p-1 backdrop-blur-md">
+      <div className={groupClass} role="group" aria-label="Time of day">
         {TIMES.map((time) => {
           const Icon = time.icon;
           const active = timeOfDay === time.id;
@@ -87,8 +99,9 @@ export default function ExplorerToolbar({
               onClick={() => setTimeOfDay(time.id)}
               aria-pressed={active}
               title={`${time.label} light`}
-              className={`flex items-center gap-1.5 rounded-[2px] px-2.5 py-1.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors ${
-                active ? 'bg-ink text-bone' : 'text-ink/60 hover:text-ink'
+              aria-label={`${time.label} light`}
+              className={`${controlClass} ${
+                active ? 'bg-ink text-bone' : 'text-ink/70 hover:bg-ink/5 hover:text-ink'
               }`}
             >
               <Icon size={13} aria-hidden="true" />
@@ -98,13 +111,13 @@ export default function ExplorerToolbar({
         })}
       </div>
 
-      <div className="flex items-center gap-1 rounded-sm border border-ink/12 bg-bone/92 p-1 backdrop-blur-md">
+      <div className={groupClass} role="group" aria-label="Scene controls">
         <button
           type="button"
           onClick={toggleLabels}
           aria-pressed={labelsVisible}
-          className={`rounded-[2px] px-2.5 py-1.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors ${
-            labelsVisible ? 'bg-ink text-bone' : 'text-ink/60 hover:text-ink'
+          className={`${controlClass} ${
+            labelsVisible ? 'bg-ink text-bone' : 'text-ink/70 hover:bg-ink/5 hover:text-ink'
           }`}
         >
           Labels
@@ -112,8 +125,9 @@ export default function ExplorerToolbar({
         <button
           type="button"
           onClick={reset}
-          className="flex items-center gap-1.5 rounded-[2px] px-2.5 py-1.5 text-[10.5px] uppercase tracking-[0.14em] text-ink/60 transition-colors hover:text-ink"
+          className={`${controlClass} text-ink/70 hover:bg-ink/5 hover:text-ink`}
           title="Reset the view"
+          aria-label="Reset the view"
         >
           <RotateCcw size={13} aria-hidden="true" />
           <span className="hidden sm:inline">Reset</span>
@@ -122,8 +136,9 @@ export default function ExplorerToolbar({
           type="button"
           onClick={onFullscreen}
           aria-pressed={fullscreen}
-          className="flex items-center gap-1.5 rounded-[2px] px-2.5 py-1.5 text-[10.5px] uppercase tracking-[0.14em] text-ink/60 transition-colors hover:text-ink"
+          className={`${controlClass} text-ink/70 hover:bg-ink/5 hover:text-ink`}
           title="Fullscreen explorer"
+          aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
         >
           <Maximize2 size={13} aria-hidden="true" />
           <span className="hidden sm:inline">Full</span>

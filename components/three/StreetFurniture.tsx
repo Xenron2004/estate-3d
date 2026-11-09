@@ -34,6 +34,17 @@ export default function StreetFurniture({
     () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.85 }),
     [],
   );
+  const lampIntensity = timeOfDay === 'dusk' ? 22 : timeOfDay === 'golden' ? 3 : 0;
+  const litLampPositions: [number, number, number][] = [
+    [-4.5, 6.6, 40],
+    [-4.5, 6.6, 92],
+    [-4.5, 6.6, 148],
+    [4.5, 6.6, 168],
+    [-16, 6.6, 132],
+    [16, 6.6, 168],
+    [-22, 6.6, 30],
+    [22, 6.6, 30],
+  ];
 
   const lights = useMemo(() => {
     const poles: InstanceDef[] = [];
@@ -234,6 +245,17 @@ export default function StreetFurniture({
       <Instances geometry={pole} material={metalMaterial} items={lights.poles} castShadow={quality === 'high'} />
       <Instances geometry={box} material={metalMaterial} items={lights.arms} />
       <Instances geometry={box} material={lampMaterial} items={lights.heads} />
+      {lampIntensity > 0 &&
+        litLampPositions.map((position) => (
+          <pointLight
+            key={position.join('-')}
+            position={position}
+            color="#ffd19a"
+            intensity={lampIntensity}
+            distance={34}
+            decay={2}
+          />
+        ))}
       <Instances geometry={box} material={woodMaterial} items={benches} castShadow={quality === 'high'} receiveShadow />
       <Instances geometry={box} material={metalMaterial} items={bins} castShadow={quality === 'high'} />
       <Instances geometry={box} material={metalMaterial} items={cars.bodies} castShadow={quality === 'high'} receiveShadow />

@@ -26,27 +26,27 @@ export default function PlanPlaceholder({ className }: { className?: string }) {
       aria-label="Schematic master plan of Aurelia Estates showing fifty parcels, internal roads and a central park"
       preserveAspectRatio="xMidYMid slice"
     >
-      <rect x={0} y={0} width={W} height={H} fill="#c8bda4" />
+      <rect x={0} y={0} width={W} height={H} fill="#e7ebdd" />
       <rect
         x={X(GREEN.parkMinX)}
         y={Y(GREEN.parkMaxZ)}
         width={GREEN.parkMaxX - GREEN.parkMinX}
         height={GREEN.parkMaxZ - GREEN.parkMinZ}
-        fill="#8b9c68"
+        fill="#abc38e"
       />
       <rect
         x={X(GREEN.beltMinX)}
         y={Y(GREEN.beltMaxZ)}
         width={GREEN.beltMaxX - GREEN.beltMinX}
         height={GREEN.beltMaxZ - GREEN.beltMinZ}
-        fill="#8b9c68"
+        fill="#b7c99e"
       />
       <rect
         x={X(-26)}
         y={Y(GREEN.playMaxZ)}
         width={52}
         height={GREEN.playMaxZ - GREEN.playMinZ}
-        fill="#d8c69c"
+        fill="#d6dec4"
       />
 
       {Object.values(ROADS).map((road) => {
@@ -58,7 +58,7 @@ export default function PlanPlaceholder({ className }: { className?: string }) {
             y={isX ? Y(road.center + road.width / 2) : Y(road.to)}
             width={isX ? road.to - road.from : road.width}
             height={isX ? road.width : road.to - road.from}
-            fill="#3c3c39"
+            fill="#667a66"
           />
         );
       })}

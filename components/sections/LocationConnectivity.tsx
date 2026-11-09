@@ -1,138 +1,74 @@
+﻿import { ArrowUpRight, MapPin } from 'lucide-react';
 import Reveal from '@/components/ui/Reveal';
-import SectionHeading from '@/components/ui/SectionHeading';
 
 const FACILITIES = [
-  { name: 'District arterial (60 ft)', distance: '0 m', note: 'frontage — the site address' },
-  { name: 'Secondary link road', distance: '4.2 km', note: 'illustrative' },
-  { name: 'Nearest town centre', distance: '6.5 km', note: 'illustrative' },
-  { name: 'School cluster', distance: '3.8 km', note: 'illustrative — not a named institution' },
-  { name: 'District hospital', distance: '9.4 km', note: 'illustrative' },
-  { name: 'Railway station', distance: '11.2 km', note: 'illustrative' },
-  { name: 'Airport access road', distance: '18.6 km', note: 'illustrative' },
+  { name: 'The 60 ft connective road', distance: 'At your doorstep' },
+  { name: 'School cluster', distance: '3.8 km' },
+  { name: 'Secondary link road', distance: '4.2 km' },
+  { name: 'Town centre', distance: '6.5 km' },
+  { name: 'District hospital', distance: '9.4 km' },
+  { name: 'Railway station', distance: '11.2 km' },
+  { name: 'Airport access road', distance: '18.6 km' },
 ];
 
 export default function LocationConnectivity() {
   return (
-    <section id="location" className="scroll-mt-24 bg-bone px-5 py-24 sm:px-8 sm:py-32">
-      <div className="mx-auto max-w-[1440px]">
-        <div className="grid gap-14 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-4">
+    <section id="location" className="section-space scroll-mt-24 bg-bone">
+      <div className="site-shell">
+        <Reveal>
+          <div className="flex flex-col justify-between gap-7 border-t border-ink/15 pt-6 md:flex-row md:items-end">
+            <div>
+              <p className="eyebrow flex items-center gap-3"><span className="text-bronze">05 /</span> Connected, naturally</p>
+              <h2 className="mt-7 font-display text-[clamp(3rem,6.2vw,5.6rem)] leading-[1.01] tracking-[-0.05em]">Away from the rush.<br /><span className="italic text-bronze">Close to your world.</span></h2>
+            </div>
+            <p className="max-w-[33ch] pb-1 text-[14px] leading-[1.8] text-ink/70">A quiet address behind a landscaped edge, with a direct connection to the 60 ft road beyond.</p>
+          </div>
+        </Reveal>
+        <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:gap-12">
+          <div className="lg:col-span-8">
             <Reveal>
-              <SectionHeading
-                index="07"
-                eyebrow="Location & connectivity"
-                title={
-                  <>
-                    On the arterial, <span className="italic text-bronze">off the noise.</span>
-                  </>
-                }
-                intro="Aurelia sits behind a single gated edge off a 60 ft road, so the township reads as a quiet enclave while still holding a direct connection to the wider network."
-              />
-            </Reveal>
-
-            <Reveal delay={0.08}>
-              <div className="mt-10 border-t border-ink/12">
-                {FACILITIES.map((facility) => (
-                  <div
-                    key={facility.name}
-                    className="flex items-baseline justify-between gap-6 border-b border-ink/12 py-3.5"
-                  >
-                    <div>
-                      <div className="text-[14px] text-ink">{facility.name}</div>
-                      <div className="text-[11px] text-ink/45">{facility.note}</div>
-                    </div>
-                    <div className="numeric text-[14px] text-ink/70">{facility.distance}</div>
-                  </div>
-                ))}
+              <div className="relative overflow-hidden rounded-[22px] border border-ink/10 bg-[#e5eadd]">
+                <svg viewBox="0 0 760 590" className="h-auto w-full" role="img" aria-label="Illustrative location diagram of Aurelia Estates, a school cluster, town centre and connective road. Not a real map.">
+                  <defs>
+                    <pattern id="location-grid" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M38 0H0V38" fill="none" stroke="#162c25" strokeOpacity="0.045" /></pattern>
+                  </defs>
+                  <rect width="760" height="590" fill="#e5eadd" />
+                  <rect width="760" height="590" fill="url(#location-grid)" />
+                  <path d="M-40 50Q130-30 190 70T260 220T80 300T-40 430Z" fill="#c8d3bb" />
+                  <path d="M630-30Q560 100 650 160T740 330T820 380V-30Z" fill="#c8d3bb" />
+                  <path d="M-20 380L250 340L380 375L600 355L790 310" fill="none" stroke="#f6f7f1" strokeWidth="22" />
+                  <path d="M180-30L225 190L186 350L240 610" fill="none" stroke="#f6f7f1" strokeWidth="22" />
+                  <path d="M570-20L558 190L600 360L560 610" fill="none" stroke="#f6f7f1" strokeWidth="18" />
+                  <path d="M-20 108L300 112L565 87L790 112" fill="none" stroke="#f6f7f1" strokeWidth="20" />
+                  <rect x="290" y="165" width="230" height="225" rx="12" fill="#162c25" />
+                  <rect x="306" y="182" width="198" height="191" rx="7" fill="#2f4538" />
+                  <path d="M405 183V373M307 245H503M307 309H503" stroke="#d5e6a0" strokeOpacity="0.45" strokeWidth="5" />
+                  <rect x="387" y="198" width="36" height="155" rx="17" fill="#d5e6a0" />
+                  {[322, 347, 445, 470].map((x) => <g key={x}>{[201, 263, 326].map((y) => <rect key={y} x={x} y={y} width="18" height="29" rx="2" fill="#82967b" />)}</g>)}
+                  <path d="M405 390V460" stroke="#162c25" strokeWidth="20" />
+                  <path d="M-20 470H780" stroke="#738074" strokeWidth="44" />
+                  <path d="M-20 470H780" stroke="#e9eddf" strokeWidth="2" strokeDasharray="15 14" />
+                  <rect x="328" y="245" width="154" height="61" rx="30" fill="#f3f3ed" />
+                  <text x="405" y="282" textAnchor="middle" fontFamily="Georgia, serif" fontSize="25" fill="#162c25">Aurelia Estates</text>
+                  <circle cx="405" cy="410" r="6" fill="#d5e6a0" />
+                  <text x="438" y="425" fontFamily="Arial, sans-serif" fontSize="14" fill="#415342">Gated arrival</text>
+                  <g transform="translate(108 176)"><circle r="6" fill="#657b4e" /><circle r="16" fill="none" stroke="#657b4e" strokeOpacity="0.4" /><text x="-42" y="38" fill="#415342" fontFamily="Arial, sans-serif" fontSize="17">Schools</text></g>
+                  <g transform="translate(636 250)"><circle r="6" fill="#657b4e" /><circle r="16" fill="none" stroke="#657b4e" strokeOpacity="0.4" /><text x="-41" y="38" fill="#415342" fontFamily="Arial, sans-serif" fontSize="17">Town centre</text></g>
+                  <text x="34" y="512" fontFamily="Arial, sans-serif" fontSize="15" letterSpacing="2" fill="#415342">60 FT CONNECTIVE ROAD</text>
+                  <g transform="translate(698 44)"><path d="M0 25V0M-6 8L0 0L6 8" fill="none" stroke="#415342" strokeWidth="1.5" /><text x="0" y="-10" textAnchor="middle" fill="#415342" fontFamily="Arial, sans-serif" fontSize="11">N</text></g>
+                </svg>
+                <div className="absolute left-5 top-5 rounded-full bg-bone/95 px-3 py-2 text-[9px] uppercase tracking-[0.18em] text-ink/70">A sense of place / Illustrative map</div>
+                <a href="#master-plan" className="absolute bottom-5 right-5 inline-flex items-center gap-3 rounded-full bg-ink px-5 py-3 text-[11px] text-bone transition-colors hover:bg-bronze">Explore the master plan <ArrowUpRight size={14} aria-hidden="true" /></a>
               </div>
-            </Reveal>
-
-            <Reveal delay={0.12}>
-              <p className="mt-8 rounded-sm border border-ink/12 bg-bone-deep/60 p-5 text-[12.5px] leading-relaxed text-ink/60">
-                <strong className="font-medium text-ink/80">Illustrative geography.</strong> The map
-                and every distance above are placeholders created for this demonstration. They do not
-                describe a real location, a surveyed route, a verified travel time or a named
-                institution, and they must not be used for any decision.
-              </p>
             </Reveal>
           </div>
-
-          <div className="lg:col-span-7 lg:col-start-6">
-            <Reveal delay={0.06}>
-              <div className="overflow-hidden rounded-sm border border-ink/12 bg-sand">
-                <svg
-                  viewBox="0 0 800 520"
-                  className="h-auto w-full"
-                  role="img"
-                  aria-label="Illustrative schematic map showing Aurelia Estates set back from a 60 ft arterial"
-                >
-                  <rect width="800" height="520" fill="#e3dac6" />
-                  {/* fields */}
-                  {[
-                    [0, 0, 250, 160],
-                    [560, 0, 240, 120],
-                    [0, 300, 200, 220],
-                    [620, 330, 180, 190],
-                  ].map(([x, y, w, h], index) => (
-                    <rect
-                      key={index}
-                      x={x}
-                      y={y}
-                      width={w}
-                      height={h}
-                      fill={index % 2 === 0 ? '#c8c39a' : '#b7bd8e'}
-                      opacity={0.75}
-                    />
-                  ))}
-                  {/* arterial */}
-                  <rect x={0} y={430} width={800} height={54} fill="#4a4a45" />
-                  <line x1={0} y1={457} x2={800} y2={457} stroke="#e8e3d4" strokeWidth={2} strokeDasharray="18 14" />
-                  <text x={28} y={420} fill="#2c3930" fontSize={13} letterSpacing={2}>
-                    60 FT CONNECTIVE ROAD
-                  </text>
-                  {/* connector */}
-                  <rect x={372} y={120} width={40} height={310} fill="#4a4a45" />
-                  {/* ring */}
-                  <rect x={300} y={60} width={420} height={250} fill="none" stroke="#6d6d66" strokeWidth={7} />
-                  {/* site */}
-                  <rect x={392} y={150} width={190} height={160} fill="#8b9c68" stroke="#2c3930" strokeWidth={2} />
-                  <rect x={392} y={150} width={190} height={160} fill="none" stroke="#a8794a" strokeWidth={3} strokeDasharray="6 5" />
-                  <text x={487} y={236} textAnchor="middle" fill="#16211c" fontSize={17} letterSpacing={3}>
-                    AURELIA
-                  </text>
-                  <text x={487} y={258} textAnchor="middle" fill="#16211c" fontSize={17} letterSpacing={3}>
-                    ESTATES
-                  </text>
-                  {/* access road */}
-                  <line x1={392} y1={300} x2={392} y2={430} stroke="#4a4a45" strokeWidth={22} />
-                  {/* landmarks */}
-                  {[
-                    { x: 170, y: 150, label: 'School cluster' },
-                    { x: 640, y: 210, label: 'Town centre' },
-                    { x: 690, y: 400, label: 'Hospital' },
-                    { x: 150, y: 470, label: 'Railway' },
-                  ].map((point) => (
-                    <g key={point.label}>
-                      <circle cx={point.x} cy={point.y} r={6} fill="#16211c" />
-                      <circle cx={point.x} cy={point.y} r={13} fill="none" stroke="#16211c" strokeWidth={1} opacity={0.4} />
-                      <text x={point.x + 20} y={point.y + 4} fill="#16211c" fontSize={12}>
-                        {point.label}
-                      </text>
-                    </g>
-                  ))}
-                  <text x={28} y={36} fill="#5d6a5f" fontSize={11} letterSpacing={3}>
-                    SCHEMATIC — ILLUSTRATIVE ONLY
-                  </text>
-                </svg>
+          <div className="lg:col-span-4 lg:pt-2">
+            <Reveal delay={0.08}>
+              <div className="flex items-center gap-3 pb-5 text-ink"><MapPin size={16} strokeWidth={1.4} aria-hidden="true" /><p className="eyebrow">The neighbourhood, in reach</p></div>
+              <div className="border-t border-ink/15">
+                {FACILITIES.map((facility, index) => <div key={facility.name} className="flex items-baseline justify-between gap-4 border-b border-ink/12 py-4"><div className="flex items-baseline gap-3"><span className="numeric text-[9px] text-bronze">{String(index + 1).padStart(2, '0')}</span><span className="text-[12px] leading-relaxed text-ink/80">{facility.name}</span></div><span className="numeric shrink-0 text-[12px] text-ink">{facility.distance}</span></div>)}
               </div>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <p className="mt-4 text-[11.5px] leading-relaxed text-ink/45">
-                In a production build this panel would carry a licensed map provider embed with the
-                same coordinates as the 3D model. It is drawn here as an honest placeholder rather
-                than a fabricated satellite view.
-              </p>
+              <p className="mt-6 max-w-[43ch] text-[11px] leading-[1.8] text-ink/70">The map and distances are illustrative, not a real location or a verified route. They are provided solely for this fictional development.</p>
             </Reveal>
           </div>
         </div>

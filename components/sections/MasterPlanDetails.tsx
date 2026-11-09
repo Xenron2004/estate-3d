@@ -58,182 +58,81 @@ function downloadCsv() {
 
 export default function MasterPlanDetails() {
   return (
-    <section id="plan-details" className="scroll-mt-24 bg-bone px-5 py-24 sm:px-8 sm:py-32">
-      <div className="mx-auto max-w-[1440px]">
-        <Reveal>
-          <SectionHeading
-            index="08"
-            eyebrow="Master plan details"
-            title={
-              <>
-                How the land is <span className="italic text-bronze">actually organised.</span>
-              </>
-            }
-            intro="Two blocks of five rows by five parcels, separated by a landscaped spine and bound by a link road on each side. Everything below is read directly from the configuration that drives the model."
-          />
-        </Reveal>
+    <section id="plan-details" className="section-space scroll-mt-24">
+      <div className="site-shell">
+        <div className="grid items-end gap-8 lg:grid-cols-12">
+          <Reveal className="lg:col-span-8">
+            <SectionHeading index="06" eyebrow="Design in the details" title={<>Beautifully planned.<br /><span className="italic text-bronze">Clearly considered.</span></>} />
+          </Reveal>
+          <Reveal className="lg:col-span-4" delay={0.08}>
+            <p className="max-w-[35ch] text-[14px] leading-[1.85] text-ink/70">A closer look at the original plot layout, the spaces between, and the infrastructure that brings it together.</p>
+          </Reveal>
+        </div>
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-12 lg:gap-12">
+        <div className="mt-12 grid gap-8 lg:mt-16 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <Reveal>
-              <div className="overflow-hidden rounded-sm border border-ink/12 bg-sand p-4">
-                <svg
-                  viewBox="0 0 250 202"
-                  className="h-auto w-full"
-                  role="img"
-                  aria-label="Diagram of the block layout, roads and open space"
-                >
-                  <rect x={0} y={0} width={250} height={202} fill="#e6ddc9" />
-                  {/* roads */}
-                  <rect x={0} y={194} width={250} height={9} fill="#8d8d86" />
-                  <rect x={20} y={168} width={210} height={9} fill="#8d8d86" />
-                  <rect x={119.5} y={9} width={9} height={193} fill="#8d8d86" />
-                  <rect x={11} y={40} width={9} height={128} fill="#8d8d86" />
-                  <rect x={228} y={40} width={9} height={128} fill="#8d8d86" />
-                  <rect x={20} y={105} width={210} height={9} fill="#8d8d86" />
-                  <rect x={20} y={50} width={210} height={9} fill="#8d8d86" />
-                  {/* green spine */}
-                  <rect x={113.5} y={33} width={21} height={77} fill="#9db07a" />
-                  <rect x={113.5} y={13} width={21} height={64} fill="#9db07a" />
-                  {/* blocks */}
-                  {PLOTS.map((plot) => (
-                    <rect
-                      key={plot.id}
-                      x={plot.minX + 125}
-                      y={198 - plot.maxZ}
-                      width={plot.width}
-                      height={plot.depth}
-                      fill="#f2ead9"
-                      stroke="#9c927a"
-                      strokeWidth={0.3}
-                    />
-                  ))}
-                  <text x={60} y={40} fontSize={5} fill="#2c3930" letterSpacing={1}>
-                    BLOCK A
-                  </text>
-                  <text x={175} y={40} fontSize={5} fill="#2c3930" letterSpacing={1}>
-                    BLOCK B
-                  </text>
-                  <text x={124} y={20} fontSize={4} fill="#2c3930" letterSpacing={0.6}>
-                    CENTRAL PARK
-                  </text>
-                  <text x={124} y={100} fontSize={4} fill="#2c3930" letterSpacing={0.6}>
-                    PLAY COURT
-                  </text>
-                  <text x={18} y={196} fontSize={4} fill="#f2ead9" letterSpacing={0.6}>
-                    60 FT CONNECTIVE ROAD
-                  </text>
-                </svg>
+              <div className="overflow-hidden rounded-[24px] bg-bone-deep p-5 sm:p-8">
+                <div className="mb-6 flex items-center justify-between text-[10px] tracking-[0.1em] text-ink/70 uppercase"><span>The original plot plan</span><span>50 parcels / A + B</span></div>
+                <div className="overflow-hidden rounded-2xl border border-ink/10 bg-bone">
+                  <svg viewBox="0 0 270 236" className="h-auto w-full" role="img" aria-label="Schematic original plan with fifty parcels, connecting roads and a central green">
+                    <rect width="270" height="236" fill="#eef0e6" />
+                    <g transform="translate(10 20)">
+                      <rect x={GREEN.parkMinX + 125} y={198 - GREEN.parkMaxZ} width={GREEN.parkMaxX - GREEN.parkMinX} height={GREEN.parkMaxZ - GREEN.parkMinZ} rx="2" fill="#adc38c" />
+                      <rect x={GREEN.beltMinX + 125} y={198 - GREEN.beltMaxZ} width={GREEN.beltMaxX - GREEN.beltMinX} height={GREEN.beltMaxZ - GREEN.beltMinZ} fill="#becfa4" />
+                      {Object.values(ROADS).map((road) => <rect key={road.id} x={road.axis === 'x' ? Math.max(road.from + 125, 0) : road.center + 125 - road.width / 2} y={road.axis === 'x' ? 198 - road.center - road.width / 2 : 198 - road.to} width={road.axis === 'x' ? Math.min(road.to - road.from, 250) : road.width} height={road.axis === 'x' ? road.width : road.to - road.from} fill="#7c8d7c" />)}
+                      {PLOTS.map((plot) => <rect key={plot.id} x={plot.minX + 125} y={198 - plot.maxZ} width={plot.width - 0.6} height={plot.depth - 0.6} rx="0.6" fill={plot.block === 'A' ? '#dde6cd' : '#e5e9d9'} stroke="#899b79" strokeWidth="0.4" />)}
+                      <rect x={SITE.minX + 125} y={198 - SITE.maxZ} width={SITE.maxX - SITE.minX} height={SITE.maxZ - SITE.minZ} rx="1.5" fill="none" stroke="#30473b" strokeWidth="0.7" />
+                      <text x="57" y="110" textAnchor="middle" fontFamily="Georgia,serif" fontSize="7" fill="#162c25">Block A</text>
+                      <text x="193" y="110" textAnchor="middle" fontFamily="Georgia,serif" fontSize="7" fill="#162c25">Block B</text>
+                      <circle cx="125" cy="48" r="5" fill="#f3f3ed" />
+                      <path d="M122 49L125 43L128 49ZM123 51L125 47L127 51Z" fill="#657b4e" />
+                      <text x="125" y="206" textAnchor="middle" fontFamily="Arial,sans-serif" fontSize="3.6" letterSpacing="0.7" fill="#657b4e">60 FT CONNECTIVE ROAD</text>
+                    </g>
+                    <path d="M252 20V8M249 12L252 8L255 12" fill="none" stroke="#162c25" strokeWidth="0.7" />
+                    <text x="252" y="6" textAnchor="middle" fontSize="3.5" fill="#162c25">N</text>
+                  </svg>
+                </div>
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-4 text-[10px] text-ink/70"><span>Schematic illustration / not a legal survey</span><a href="#master-plan" className="inline-flex min-h-9 items-center gap-2 font-medium text-ink">Explore the complete township <span aria-hidden="true">↗</span></a></div>
               </div>
             </Reveal>
-
-            <Reveal delay={0.06}>
-              <div className="mt-8 overflow-hidden border border-ink/12">
-                <table className="w-full border-collapse text-left">
-                  <caption className="sr-only">Plot size bands</caption>
-                  <thead>
-                    <tr className="border-b border-ink/12 bg-bone-deep/60">
-                      <th scope="col" className="px-4 py-3 text-[10.5px] uppercase tracking-[0.16em] text-ink/50">
-                        Size band
-                      </th>
-                      <th scope="col" className="px-4 py-3 text-[10.5px] uppercase tracking-[0.16em] text-ink/50">
-                        Area
-                      </th>
-                      <th scope="col" className="px-4 py-3 text-[10.5px] uppercase tracking-[0.16em] text-ink/50">
-                        Profile
-                      </th>
-                      <th scope="col" className="px-4 py-3 text-right text-[10.5px] uppercase tracking-[0.16em] text-ink/50">
-                        Plots
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-ink/10">
-                    {MASTER_PLAN_STATS.sizeBands.map((band) => (
-                      <tr key={band.label}>
-                        <td className="px-4 py-3 text-[13.5px] text-ink">{band.label}</td>
-                        <td className="numeric px-4 py-3 text-[13px] text-ink/70">
-                          {band.areaSqft.toLocaleString('en-IN')} sq ft
-                        </td>
-                        <td className="px-4 py-3 text-[13px] text-ink/55">{band.note}</td>
-                        <td className="numeric px-4 py-3 text-right text-[13px] text-ink/70">{band.count}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Reveal>
-          </div>
-
-          <div className="lg:col-span-5">
-            <Reveal delay={0.08}>
-              <dl className="grid grid-cols-2 gap-px overflow-hidden border border-ink/12 bg-ink/12">
-                {[
-                  { label: 'Site area', value: `${MASTER_PLAN_STATS.siteAreaSqm.toLocaleString('en-IN')} m²` },
-                  { label: 'Site extent', value: `${SITE.maxX - SITE.minX} m × ${SITE.maxZ - SITE.minZ} m` },
-                  { label: 'Plot coverage', value: `${Math.round((MASTER_PLAN_STATS.plotAreaSqm / MASTER_PLAN_STATS.siteAreaSqm) * 100)}%` },
-                  { label: 'Open space', value: `${MASTER_PLAN_STATS.openSpacePercent}%` },
-                  { label: 'Park', value: `${MASTER_PLAN_STATS.parkAreaSqm.toLocaleString('en-IN')} m²` },
-                  { label: 'Play court', value: `${MASTER_PLAN_STATS.playAreaSqm.toLocaleString('en-IN')} m²` },
-                  { label: 'Clubhouse', value: `${MASTER_PLAN_STATS.clubhouseAreaSqm.toLocaleString('en-IN')} m²` },
-                  { label: 'Internal road area', value: `${MASTER_PLAN_STATS.roadAreaSqm.toLocaleString('en-IN')} m²` },
-                ].map((item) => (
-                  <div key={item.label} className="bg-bone p-4">
-                    <dt className="eyebrow text-ink/45">{item.label}</dt>
-                    <dd className="numeric mt-1.5 text-[15px] text-ink">{item.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <div className="mt-8 border-t border-ink/12">
-                {INFRASTRUCTURE.map((item) => (
-                  <div key={item.title} className="border-b border-ink/12 py-5">
-                    <h3 className="font-display text-[18px] leading-tight text-ink">{item.title}</h3>
-                    <p className="mt-2 text-[13.5px] leading-relaxed text-ink/60">{item.body}</p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.12}>
-              <div className="mt-8 rounded-sm border border-ink/12 bg-bone-deep/60 p-6">
-                <h3 className="font-display text-[20px] text-ink">Take the schedule with you</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-ink/60">
-                  Open the printable master-plan sheet and use your browser’s print dialogue to save it
-                  as a PDF, or download the full plot schedule as CSV. Both are generated from the
-                  live dataset — no static file goes stale.
-                </p>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <a
-                    href="/brochure"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-sm bg-ink px-4 py-3 text-[10.5px] uppercase tracking-[0.16em] text-bone transition-colors hover:bg-bronze"
-                  >
-                    <FileText size={14} aria-hidden="true" />
-                    Printable master plan
-                  </a>
-                  <button
-                    type="button"
-                    onClick={downloadCsv}
-                    className="inline-flex items-center gap-2 rounded-sm border border-ink/25 px-4 py-3 text-[10.5px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-bone"
-                  >
-                    <Download size={14} aria-hidden="true" />
-                    Download CSV
-                  </button>
+            <Reveal delay={0.07}>
+              <div className="mt-6 rounded-[22px] border border-ink/12 p-6 sm:p-8">
+                <h3 className="font-display text-[30px] leading-tight">The details, to keep.</h3>
+                <p className="mt-3 max-w-[45ch] text-[13px] leading-[1.8] text-ink/70">Print the master plan or take a copy of the full plot schedule for a closer look.</p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a href="/brochure" target="_blank" rel="noreferrer" className="button-primary"><FileText size={15} aria-hidden="true" />Printable plan</a>
+                  <button type="button" onClick={downloadCsv} className="button-secondary"><Download size={15} aria-hidden="true" />Plot schedule</button>
                 </div>
               </div>
             </Reveal>
           </div>
+          <div className="lg:col-span-5 lg:pl-4">
+            <Reveal delay={0.08}>
+              <dl className="grid grid-cols-2 gap-x-8 gap-y-7 border-b border-ink/15 pb-8">
+                {[
+                  { label: 'Original site', value: MASTER_PLAN_STATS.siteAreaAcres.toFixed(2), unit: 'acres' },
+                  { label: 'Central park', value: MASTER_PLAN_STATS.parkAreaSqm.toLocaleString('en-IN'), unit: 'sq m' },
+                  { label: 'Plot size bands', value: String(MASTER_PLAN_STATS.sizeBands.length).padStart(2, '0'), unit: 'profiles' },
+                  { label: 'Open space', value: String(MASTER_PLAN_STATS.openSpacePercent), unit: '%' },
+                ].map((stat) => <div key={stat.label}><dt className="eyebrow text-ink/70">{stat.label}</dt><dd className="numeric mt-3 font-display text-[38px] leading-none tracking-[-0.05em]">{stat.value}<span className="ml-1.5 font-sans text-[11px] tracking-normal text-ink/70">{stat.unit}</span></dd></div>)}
+              </dl>
+            </Reveal>
+            {INFRASTRUCTURE.filter((_, index) => index !== 3).map((item, index) => (
+              <Reveal key={item.title} delay={0.04 * index}>
+                <article className="border-b border-ink/15 py-6"><div className="flex items-baseline gap-4"><span className="numeric text-[10px] text-bronze">{String(index + 1).padStart(2, '0')}</span><h3 className="font-display text-[25px] leading-tight">{item.title}</h3></div><p className="mt-3 pl-8 text-[12px] leading-[1.85] text-ink/70">{item.body}</p></article>
+              </Reveal>
+            ))}
+          </div>
         </div>
-
-        <Reveal delay={0.1}>
-          <p className="mt-10 max-w-[80ch] text-[12px] leading-relaxed text-ink/45">
-            Road widths used in this model: {Object.values(ROADS)
-              .map((road) => `${road.label} (${road.width.toFixed(2)} m)`)
-              .join('; ')}. Clubhouse and play areas are drawn to the footprints described above.
-          </p>
+        <Reveal>
+          <div className="mt-12 overflow-x-auto rounded-[20px] border border-ink/15">
+            <table className="w-full min-w-[520px] border-collapse text-left">
+              <caption className="sr-only">Original residential plot size profiles</caption>
+              <thead><tr className="bg-bone-deep/70">{['Size profile', 'Area', 'Character', 'Parcels'].map((label) => <th key={label} scope="col" className="px-6 py-5 text-[10px] font-medium tracking-[0.12em] text-ink/70 uppercase last:text-right">{label}</th>)}</tr></thead>
+              <tbody>{MASTER_PLAN_STATS.sizeBands.map((band) => <tr key={band.label} className="border-t border-ink/10"><td className="px-6 py-5 font-display text-[21px]">{band.label}</td><td className="numeric px-6 py-5 text-[13px]">{band.areaSqft.toLocaleString('en-IN')} sq ft</td><td className="px-6 py-5 text-[12px] text-ink/70">{band.note}</td><td className="numeric px-6 py-5 text-right text-[13px]">{band.count}</td></tr>)}</tbody>
+            </table>
+          </div>
         </Reveal>
       </div>
     </section>

@@ -4,6 +4,11 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { mulberry32 } from '@/lib/three/assets';
 import { paintSitePlan, paintTerrain, PLAN } from '@/lib/three/plan-painter';
+import { createSurfaceTexture } from '@/lib/three/surfaces';
+import Instances, { type InstanceDef } from './Instances';
+import { ROADS } from '@/lib/data/township';
+import { PARK_TRAIL_POINTS } from '@/lib/three/park-trail';
+import { DISTRICT_BOUNDS } from '@/lib/data/apartment-district';
 
 function useCanvasTexture(width: number, height: number, painter: (ctx: CanvasRenderingContext2D, w: number, h: number) => void) {
   return useMemo(() => {
@@ -19,15 +24,15 @@ function useCanvasTexture(width: number, height: number, painter: (ctx: CanvasRe
   }, [width, height, painter]);
 }
 
-function DirtTrack({ points, width = 3.4 }: { points: [number, number][]; width?: number }) {
+function DirtTrack({ points, width = 3.4, height = 0.025, color = '#b3a482', closed = false, avoidRoads = false }: { points: [number, number][]; width?: number; height?: number; color?: string; closed?: boolean; avoidRoads?: boolean }) {
   const geometry = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3(
-      points.map((point) => new THREE.Vector3(point[0], 0.02, point[1])),
-      false,
+      points.map((point) => new THREE.Vector3(point[0], height, point[1])),
+      closed,
       'catmullrom',
-      0.4,
+      0.35,
     );
-    const segments = 48;
+    const segments = closed ? 160 : 48;
     const vertices: number[] = [];
     const uvs: number[] = [];
     for (let i = 0; i <= segments; i += 1) {
@@ -41,8 +46,14 @@ function DirtTrack({ points, width = 3.4 }: { points: [number, number][]; width?
     }
     const indices: number[] = [];
     for (let i = 0; i < segments; i += 1) {
+      const point = curve.getPoint((i + 0.5) / segments);
+      if (avoidRoads && Object.values(ROADS).some((road) => {
+        const along = road.axis === 'x' ? point.x : point.z;
+        const across = road.axis === 'x' ? point.z : point.x;
+        return along > road.from - 1 && along < road.to + 1 && Math.abs(across - road.center) < road.width / 2 + 1.5;
+      })) continue;
       const a = i * 2;
-      indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+      indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
@@ -50,11 +61,11 @@ function DirtTrack({ points, width = 3.4 }: { points: [number, number][]; width?
     geo.setIndex(indices);
     geo.computeVertexNormals();
     return geo;
-  }, [points, width]);
+  }, [points, width, height, closed, avoidRoads]);
 
   return (
     <mesh geometry={geometry} receiveShadow>
-      <meshStandardMaterial color="#b3a482" roughness={1} transparent opacity={0.92} />
+      <meshStandardMaterial color={color} roughness={1} />
     </mesh>
   );
 }
@@ -62,6 +73,11 @@ function DirtTrack({ points, width = 3.4 }: { points: [number, number][]; width?
 export default function SiteGround({ quality }: { quality: 'high' | 'low' }) {
   const planTexture = useCanvasTexture(2048, 1655, paintSitePlan);
   const terrainTexture = useCanvasTexture(1024, 1024, paintTerrain);
+  const groundGrain = useMemo(() => createSurfaceTexture('soil', 55, 44), []);
+  const terrainGrain = useMemo(() => createSurfaceTexture('grass', 200, 200), []);
+  const contextBox = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+  const contextMaterial = useMemo(() => new THREE.MeshStandardMaterial({ roughness: 0.92 }), []);
+  const contextGlass = useMemo(() => new THREE.MeshStandardMaterial({ roughness: 0.32, metalness: 0.16 }), []);
 
   useMemo(() => {
     terrainTexture.wrapS = THREE.RepeatWrapping;
@@ -72,11 +88,9 @@ export default function SiteGround({ quality }: { quality: 'high' | 'low' }) {
 
   const buildings = useMemo(() => {
     const random = mulberry32(4242);
-    const buildings: {
-      position: [number, number, number];
-      scale: [number, number, number];
-      color: string;
-    }[] = [];
+    const buildings: InstanceDef[] = [];
+    const contextTrim: InstanceDef[] = [];
+    const contextWindows: InstanceDef[] = [];
     const tones = ['#cbbfa6', '#b9ad95', '#d6c8ad', '#a9a292', '#c3b193', '#b5ac9c'];
     for (let i = 0; i < 44; i += 1) {
       const angle = random() * Math.PI * 2;
@@ -87,13 +101,25 @@ export default function SiteGround({ quality }: { quality: 'high' | 'low' }) {
       const width = 8 + random() * 20;
       const depth = 8 + random() * 18;
       const height = 3.6 + random() * 9;
+      // Keep the new apartment precinct and its approach clear of random context buildings.
+      if (x + width / 2 > DISTRICT_BOUNDS.minX - 5 && x - width / 2 < DISTRICT_BOUNDS.maxX + 5 &&
+        z + depth / 2 > 183 && z - depth / 2 < DISTRICT_BOUNDS.maxZ + 5) continue;
       buildings.push({
         position: [x, height / 2, z],
         scale: [width, height, depth],
         color: tones[Math.floor(random() * tones.length)],
       });
+      contextTrim.push({ position: [x, height + 0.2, z], scale: [width + 0.5, 0.4, depth + 0.5], color: '#e2d8c5' });
+      if (i % 3 === 0) {
+        buildings.push({ position: [x + width * 0.15, height + 1.2, z - depth * 0.15], scale: [width * 0.48, 2.4, depth * 0.55], color: '#c2b69d' });
+      }
+      for (let floor = 0; floor < Math.floor(height / 3); floor += 1) {
+        for (let bay = -1; bay <= 1; bay += 1) {
+          for (const side of [-1, 1]) contextWindows.push({ position: [x + bay * width * 0.27, 1.7 + floor * 3, z + side * (depth / 2 + 0.025)], scale: [width * 0.13, 1.3, 0.08], color: '#667c7c' });
+        }
+      }
     }
-    return buildings;
+    return { masses: buildings, trim: contextTrim, windows: contextWindows };
   }, []);
 
   const hills = useMemo(() => {
@@ -118,14 +144,17 @@ export default function SiteGround({ quality }: { quality: 'high' | 'low' }) {
       {/* terrain beyond the development */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 40]} receiveShadow>
         <planeGeometry args={[2600, 2600]} />
-        <meshStandardMaterial map={terrainTexture} roughness={1} metalness={0} color="#cfc3a4" />
+        <meshStandardMaterial map={terrainTexture} bumpMap={terrainGrain} bumpScale={0.1} roughness={1} metalness={0} color="#e2e5c5" />
       </mesh>
 
       {/* painted master plan ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, planCenterZ]} receiveShadow>
         <planeGeometry args={[planWidth, planDepth]} />
-        <meshStandardMaterial map={planTexture} roughness={0.98} metalness={0} />
+        <meshStandardMaterial map={planTexture} bumpMap={groundGrain} bumpScale={0.045} roughness={0.98} metalness={0} />
       </mesh>
+
+      {/* Raised fine-grain park paving follows the walkers around the conservatory. */}
+      <DirtTrack points={PARK_TRAIL_POINTS} width={2.2} height={0.065} color="#c9c3b1" closed avoidRoads />
 
       {/* dirt tracks leaving the site */}
       <DirtTrack points={[[-150, 210], [-260, 300], [-420, 360], [-620, 430]]} />
@@ -135,18 +164,9 @@ export default function SiteGround({ quality }: { quality: 'high' | 'low' }) {
       {/* distant low-rise context */}
       {quality === 'high' && (
         <group>
-          {buildings.map((building, index) => (
-            <mesh
-              key={index}
-              position={building.position}
-              scale={building.scale}
-              castShadow={false}
-              receiveShadow
-            >
-              <boxGeometry args={[1, 1, 1]} />
-              <meshStandardMaterial color={building.color} roughness={0.95} />
-            </mesh>
-          ))}
+          <Instances geometry={contextBox} material={contextMaterial} items={buildings.masses} interactive={false} />
+          <Instances geometry={contextBox} material={contextMaterial} items={buildings.trim} interactive={false} />
+          <Instances geometry={contextBox} material={contextGlass} items={buildings.windows} interactive={false} />
           {/* water tower */}
           <group position={[186, 0, 236]}>
             <mesh position={[0, 11, 0]} castShadow>

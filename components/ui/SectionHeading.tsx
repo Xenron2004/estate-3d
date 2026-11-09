@@ -15,18 +15,17 @@ export default function SectionHeading({
   tone = 'light',
   className = '',
 }: Props) {
-  const muted = tone === 'dark' ? 'text-bone/55' : 'text-ink/50';
+  const muted = tone === 'dark' ? 'text-bone/65' : 'text-ink/70';
   const body = tone === 'dark' ? 'text-bone/70' : 'text-ink/70';
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-4">
-        {index && <span className="eyebrow numeric text-bronze">{index}</span>}
-        <span className={`eyebrow ${muted}`}>{eyebrow}</span>
-        <span className={`h-px flex-1 ${tone === 'dark' ? 'bg-bone/15' : 'bg-ink/12'}`} />
+      <div className={`section-kicker ${muted}`}>
+        <span>{eyebrow}</span>
+        {index && <span className={`numeric ml-1 ${tone === 'dark' ? 'text-lime/65' : 'text-ink/70'}`}>/ {index}</span>}
       </div>
-      <h2 className="mt-6 text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.02] max-w-[18ch]">{title}</h2>
-      {intro && <p className={`mt-5 max-w-[52ch] text-[15px] leading-relaxed ${body}`}>{intro}</p>}
+      <h2 className={`editorial-title mt-7 max-w-[17ch] ${tone === 'dark' ? 'text-bone' : 'text-ink'}`}>{title}</h2>
+      {intro && <div className={`mt-6 max-w-[48ch] text-[14px] leading-[1.8] sm:text-[15px] ${body}`}>{intro}</div>}
     </div>
   );
 }

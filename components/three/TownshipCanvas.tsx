@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import Scene from './Scene';
 import { useExplorerStore } from '@/lib/store';
 import type { Plot } from '@/lib/types';
+import { CAMERA_PRESETS } from '@/lib/camera';
 
 class WebGLBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -39,7 +40,7 @@ function CaptureAgent() {
       const store = useExplorerStore.getState();
       window.setTimeout(() => {
         try {
-          const url = gl.domElement.toDataURL('image/jpeg', 0.88);
+          const url = gl.domElement.toDataURL('image/jpeg', 0.96);
           store.setCapture(request.preset.id, url);
         } catch (error) {
           console.warn('[aurelia] scene capture failed', error);
@@ -61,11 +62,17 @@ interface Props {
 export default function TownshipCanvas({ variant, quality, className }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const [dpr, setDpr] = useState(1.35);
+  const [dpr, setDpr] = useState(quality === 'high' ? 1.75 : 1.5);
   const [supported, setSupported] = useState<boolean | null>(null);
   const [tooltip, setTooltip] = useState<{ plot: Plot; x: number; y: number } | null>(null);
   const captureRequest = useExplorerStore((state) => state.captureRequest);
   const [forceRender, setForceRender] = useState(false);
+  const minimumDpr = quality === 'high' ? 1.5 : 1.25;
+  const maximumDpr = quality === 'high' ? 2 : 1.5;
+
+  useEffect(() => {
+    setDpr(Math.min(maximumDpr, Math.max(minimumDpr, window.devicePixelRatio || 1)));
+  }, [minimumDpr, maximumDpr]);
 
   useEffect(() => {
     try {
@@ -165,9 +172,9 @@ export default function TownshipCanvas({ variant, quality, className }: Props) {
         shadows={quality === 'high'}
         dpr={dpr}
         frameloop={visible || forceRender ? 'always' : 'never'}
-        camera={{ position: [82, 88, 272], fov: 42, near: 0.5, far: 4200 }}
+        camera={{ position: CAMERA_PRESETS.home.position, fov: 42, near: 0.5, far: 2400 }}
         gl={{
-          antialias: quality === 'high',
+          antialias: true,
           powerPreference: 'high-performance',
           preserveDrawingBuffer: true,
           alpha: false,
@@ -175,13 +182,15 @@ export default function TownshipCanvas({ variant, quality, className }: Props) {
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 1.02;
+          gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.shadowMap.type = THREE.PCFSoftShadowMap;
         }}
       >
         <PerformanceMonitor
-          bounds={(rate) => (rate > 0.9 ? [50, 90] : [20, 60])}
-          onDecline={() => setDpr(1)}
-          onIncline={() => setDpr((value) => Math.min(1.8, value + 0.2))}
+          bounds={(refreshRate) => refreshRate > 90 ? [40, 85] : [28, 55]}
+          onDecline={() => setDpr((value) => Math.max(minimumDpr, value - 0.25))}
+          onIncline={() => setDpr((value) => Math.min(maximumDpr, value + 0.25))}
+          onFallback={() => setDpr(minimumDpr)}
           flipflops={3}
         />
         <Scene variant={variant} quality={quality} onHover={handleHover} />
@@ -195,10 +204,10 @@ export default function TownshipCanvas({ variant, quality, className }: Props) {
           zoomSpeed={0.8}
           panSpeed={0.6}
           minDistance={14}
-          maxDistance={460}
+          maxDistance={900}
           minPolarAngle={0.05}
           maxPolarAngle={1.47}
-          target={[0, 0, 96]}
+          target={CAMERA_PRESETS.home.target}
         />
       </Canvas>
       </WebGLBoundary>

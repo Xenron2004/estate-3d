@@ -1,4 +1,8 @@
 {
   "/api/plots/route": "app/api/plots/route.js",
-  "/page": "app/page.js"
+  "/api/amenities/route": "app/api/amenities/route.js",
+  "/api/enquiries/route": "app/api/enquiries/route.js",
+  "/page": "app/page.js",
+  "/brochure/page": "app/brochure/page.js",
+  "/privacy/page": "app/privacy/page.js"
 }

@@ -1,127 +1,41 @@
 import Image from 'next/image';
+import { ArrowUpRight } from 'lucide-react';
 import Reveal from '@/components/ui/Reveal';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { MASTER_PLAN_STATS } from '@/lib/data/township';
 
-const OWNERSHIP = [
-  {
-    title: 'A parcel you can actually shape',
-    body: 'Every plot arrives with surveyed boundaries, a marked footprint and a road frontage already fixed — so the only open question is what you build inside it.',
-  },
-  {
-    title: 'Infrastructure that arrives before you do',
-    body: 'Carriageways, kerbs, footpaths, drainage, street lighting and power conduits are planned at the master-plan level, not negotiated plot by plot.',
-  },
-  {
-    title: 'Open space you did not have to buy',
-    body: 'A landscaped central park, a play court and planted belts belong to the township — shared ground that adds value to a plot you own outright.',
-  },
-];
-
 export default function Introduction() {
   return (
-    <section id="introduction" className="scroll-mt-24 bg-bone px-5 py-24 sm:px-8 sm:py-32">
-      <div className="mx-auto max-w-[1440px]">
-        <div className="grid gap-14 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-5">
-            <Reveal>
-              <SectionHeading
-                index="01"
-                eyebrow="Introduction"
-                title={
-                  <>
-                    A Place Designed for <span className="italic text-bronze">Possibilities.</span>
-                  </>
-                }
-              />
-            </Reveal>
-
-            <Reveal delay={0.08}>
-              <div className="mt-10 space-y-5 text-[15px] leading-[1.75] text-ink/75">
-                <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-display first-letter:text-[64px] first-letter:leading-[0.78] first-letter:text-ink">
-                  Buying land is an act of patience. You are not buying a finished object; you are
-                  buying the right to decide, later, what the object should be. Aurelia Estates is
-                  planned around that idea — fifty parcels laid out with the discipline of a survey and
-                  the restraint of a good architect.
-                </p>
-                <p>
-                  The township is a closed, low-density composition of two residential blocks facing a
-                  landscaped spine. Roads are 30 ft with kerbs, footpaths and covered drainage. Plots
-                  are back-to-back by design, so no home looks into another home’s courtyard. At the
-                  centre, a park and a play court hold the ground between the blocks.
-                </p>
-                <p>
-                  Nothing here is speculative: the geometry you see in the 3D model is generated from
-                  the same dataset as the inventory below it. Area, price per square foot and amenity
-                  distance on this page are computed, not decorated.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.12}>
-              <figure className="mt-12">
-                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm bg-sand">
-                  <Image
-                    src="/images/land-aerial.jpg"
-                    alt="Aerial reference photograph of cultivated land divided by informal tracks"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 45vw"
-                    className="object-cover"
-                  />
+    <section id="introduction" className="section-space scroll-mt-24">
+      <div className="site-shell grid items-center gap-14 lg:grid-cols-12 lg:gap-20">
+        <Reveal className="relative lg:col-span-6">
+          <figure>
+            <div className="media-frame aspect-[5/5.4] sm:aspect-[5/4.5] lg:aspect-[5/5.4]">
+              <Image src="/images/land-aerial.jpg" alt="Aerial landscape reference of fields bordered by mature trees" fill sizes="(max-width: 1024px) 90vw, 45vw" className="object-cover" />
+              <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-4 rounded-2xl bg-bone p-6 sm:bottom-7 sm:left-7 sm:right-7">
+                <div>
+                  <span className="eyebrow text-ink/70">The original plot plan</span>
+                  <p className="mt-2 font-display text-[42px] leading-none tracking-[-0.05em]">{MASTER_PLAN_STATS.siteAreaAcres.toFixed(2)} <span className="text-[24px] italic text-bronze">acres</span></p>
                 </div>
-                <figcaption className="mt-3 text-[11px] leading-relaxed text-ink/50">
-                  Reference imagery only — cultivated land being read as a plot. The township itself
-                  is shown in the live 3D model.
-                </figcaption>
-              </figure>
-            </Reveal>
-          </div>
-
-          <div className="lg:col-span-6 lg:col-start-7 lg:pt-24">
-            <Reveal delay={0.1}>
-              <blockquote className="border-l-2 border-bronze pl-6">
-                <p className="font-display text-[clamp(1.5rem,2.5vw,2.15rem)] leading-[1.25] text-ink">
-                  “Own the land, and the house becomes a decision rather than a compromise.”
-                </p>
-                <footer className="mt-4 text-[11px] uppercase tracking-[0.2em] text-ink/45">
-                  Aurelia Estates · design note
-                </footer>
-              </blockquote>
-            </Reveal>
-
-            <div className="mt-12 divide-y divide-ink/10 border-y border-ink/10">
-              {OWNERSHIP.map((item, index) => (
-                <Reveal key={item.title} delay={0.08 * index}>
-                  <div className="grid grid-cols-[3.2rem_1fr] gap-4 py-7">
-                    <span className="eyebrow numeric pt-1 text-bronze">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <div>
-                      <h3 className="font-display text-[21px] leading-snug text-ink">{item.title}</h3>
-                      <p className="mt-2.5 text-[14px] leading-relaxed text-ink/65">{item.body}</p>
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-
-            <Reveal delay={0.1}>
-              <div className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3">
-                {[
-                  { value: MASTER_PLAN_STATS.siteAreaAcres.toFixed(2), label: 'acres, master plan' },
-                  { value: `${MASTER_PLAN_STATS.openSpacePercent}%`, label: 'kept as open space' },
-                  { value: `${MASTER_PLAN_STATS.sizeBands.length}`, label: 'plot size bands' },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <div className="numeric font-display text-[38px] leading-none text-ink">
-                      {stat.value}
-                    </div>
-                    <div className="eyebrow mt-2 text-ink/45">{stat.label}</div>
-                  </div>
-                ))}
+                <span className="mb-1 max-w-[12ch] text-right text-[11px] leading-relaxed text-ink/70">fifty places to begin</span>
               </div>
-            </Reveal>
-          </div>
+            </div>
+            <figcaption className="mt-3 flex justify-between gap-4 text-[10px] text-ink/70"><span>Landscape reference / illustrative imagery</span><span>Aurelia Estates</span></figcaption>
+          </figure>
+        </Reveal>
+        <div className="lg:col-span-6 lg:py-8">
+          <Reveal delay={0.08}>
+            <SectionHeading index="01" eyebrow="The Aurelia way" title={<>A little more space.<br /><span className="italic text-bronze">A different pace.</span></>} />
+            <p className="mt-8 max-w-[44ch] text-[15px] leading-[1.85] text-ink/70">A home begins with the place around it. The morning walk. The shade of a tree. The space to make something entirely your own.</p>
+            <p className="mt-5 max-w-[44ch] text-[15px] leading-[1.85] text-ink/70">At Aurelia, fifty residential parcels sit around a generous green heart. Connected streets, shared gardens and a new collection of contemporary residences bring the neighbourhood together.</p>
+          </Reveal>
+          <Reveal delay={0.14}>
+            <div className="mt-9 grid grid-cols-2 gap-6 border-t border-ink/15 pt-7">
+              <div><span className="block font-display text-[27px] leading-tight">Your own canvas</span><span className="mt-2 block text-[12px] text-ink/70">Space for a home with your point of view.</span></div>
+              <div><span className="block font-display text-[27px] leading-tight">Shared by nature</span><span className="mt-2 block text-[12px] text-ink/70">A park, a pavilion, a place to belong.</span></div>
+            </div>
+            <a href="#master-plan" className="button-secondary mt-9">Get to know the neighbourhood <ArrowUpRight size={16} aria-hidden="true" /></a>
+          </Reveal>
         </div>
       </div>
     </section>

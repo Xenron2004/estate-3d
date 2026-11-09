@@ -213,6 +213,7 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
     walkRuntime.playing = mode === 'walk';
     set((state) => ({
       cameraMode: mode,
+      activeAmenity: null,
       walkActive: mode === 'walk',
       cameraRequest: {
         id: ++requestCounter,
@@ -226,6 +227,7 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
   requestCamera: (position, target, mode) =>
     set((state) => ({
       cameraMode: mode ?? state.cameraMode,
+      activeAmenity: null,
       cameraRequest: { id: ++requestCounter, position, target, mode: mode ?? state.cameraMode },
     })),
 

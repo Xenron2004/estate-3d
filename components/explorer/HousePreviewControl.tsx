@@ -17,13 +17,13 @@ export default function HousePreviewControl() {
   ];
 
   return (
-    <div className="rounded-sm border border-ink/12 bg-bone-deep/50 p-4">
+    <div className="rounded-[20px] border border-ink/8 bg-bone-deep/70 p-5 sm:p-6">
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="eyebrow text-ink/55">Visualize your future home</h3>
-        <span className="eyebrow text-bronze">Concept</span>
+        <h3 className="font-sans text-[13px] font-medium tracking-normal text-ink">Imagine your home</h3>
+        <span className="rounded-full bg-white/70 px-2 py-1 text-[10px] text-bronze">Concept</span>
       </div>
 
-      <div className="mt-3 flex gap-1.5">
+      <div className="mt-4 flex gap-1.5">
         {options.map((option) => {
           const active = houseStyle === option.id;
           const disabled = !enabled && option.id !== 'none';
@@ -34,10 +34,10 @@ export default function HousePreviewControl() {
               disabled={disabled}
               onClick={() => setHouseStyle(option.id)}
               aria-pressed={active}
-              className={`flex-1 rounded-sm border px-2 py-2 text-[10.5px] uppercase tracking-[0.12em] transition-colors ${
+              className={`min-h-11 flex-1 rounded-full border px-2 py-2 text-[11px] transition-colors ${
                 active
                   ? 'border-ink bg-ink text-bone'
-                  : 'border-ink/15 text-ink/60 hover:border-ink/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-35'
+                  : 'border-ink/15 text-ink/70 hover:border-ink/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-35'
               }`}
             >
               {option.label}
@@ -46,13 +46,11 @@ export default function HousePreviewControl() {
         })}
       </div>
 
-      <p className="mt-3 text-[11px] leading-relaxed text-ink/45">
+      <p className="mt-4 text-[11px] leading-relaxed text-ink/70">
         {enabled
-          ? 'A scaled massing study placed on the parcel with generous setbacks, shown for scale only.'
-          : 'Select an available parcel to preview a concept home on it.'}
-        {' '}
-        It is <span className="text-ink/70">not a sanctioned plan</span> and carries no architectural
-        or statutory approval.
+          ? 'See how a one or two-storey home could sit within your plot.'
+          : 'Select an available plot to explore a one or two-storey home.'}
+        {' '}Illustrative concept only, subject to architectural approval.
       </p>
     </div>
   );

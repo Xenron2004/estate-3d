@@ -17,7 +17,7 @@ interface Props {
 }
 
 /** Scroll-triggered entrance that never hides content when motion is reduced. */
-export default function Reveal({ children, className, delay = 0, y = 26, as = 'div' }: Props) {
+export default function Reveal({ children, className, delay = 0, y = 20, as = 'div' }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const Tag = as as 'div';
 
@@ -38,7 +38,7 @@ export default function Reveal({ children, className, delay = 0, y = 26, as = 'd
         {
           opacity: 1,
           y: 0,
-          duration: 0.95,
+          duration: 0.8,
           delay,
           ease: 'power3.out',
           scrollTrigger: { trigger: element, start: 'top 90%', once: true },

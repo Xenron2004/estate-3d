@@ -6,7 +6,8 @@ import * as THREE from 'three';
 import { useExplorerStore, type PanDirection } from '@/lib/store';
 import { SITE, WALKTHROUGH_POINTS } from '@/lib/data/township';
 import { setWalkT, walkRuntime } from '@/lib/walk-runtime';
-import { CAMERA_PRESETS } from '@/lib/camera';
+import { APARTMENTS_VIEW_BOUNDS, CAMERA_PRESETS, TOWNSHIP_VIEW_BOUNDS, fitCameraPosition } from '@/lib/camera';
+import { DISTRICT_BOUNDS } from '@/lib/data/apartment-district';
 
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
@@ -17,6 +18,8 @@ interface Props {
 
 export default function CameraRig({ variant = 'explorer', introDuration }: Props) {
   const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
+  const aspect = size.width / Math.max(1, size.height);
   const controls = useThree((state) => state.controls) as
     | (THREE.EventDispatcher & { target: THREE.Vector3; update: () => void })
     | null;
@@ -28,6 +31,7 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
   const lastPanRequestId = useRef(0);
   const introElapsed = useRef(0);
   const introActive = useRef(true);
+  const reducedMotion = useRef(false);
   const lastWalkNotify = useRef(0);
   const driftOffset = useRef(new THREE.Vector3());
   const upAxis = useMemo(() => new THREE.Vector3(0, 1, 0), []);
@@ -57,8 +61,24 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
       ),
     [variant],
   );
-  const homePosition = useMemo(() => new THREE.Vector3(...CAMERA_PRESETS.home.position), []);
+  const homePosition = useMemo(() => new THREE.Vector3(...fitCameraPosition(
+    CAMERA_PRESETS.home.position, CAMERA_PRESETS.home.target, TOWNSHIP_VIEW_BOUNDS, aspect,
+  )), [aspect]);
   const homeTarget = useMemo(() => new THREE.Vector3(...CAMERA_PRESETS.home.target), []);
+
+  useEffect(() => {
+    const { cameraMode, cameraRequest } = useExplorerStore.getState();
+    if (cameraMode === 'walk') return;
+    const preset = [CAMERA_PRESETS.home, CAMERA_PRESETS.apartments, CAMERA_PRESETS.plan].find((view) =>
+      cameraRequest?.position.every((value, axis) => value === view.position[axis]),
+    );
+    if (!preset) return;
+    desiredPosition.current.set(...fitCameraPosition(
+      preset.position, preset.target, preset === CAMERA_PRESETS.apartments ? APARTMENTS_VIEW_BOUNDS : TOWNSHIP_VIEW_BOUNDS, aspect,
+    ));
+    desiredTarget.current.set(...preset.target);
+    transitioning.current = true;
+  }, [aspect]);
 
   useEffect(() => {
     camera.position.copy(introPosition);
@@ -68,6 +88,22 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
     }
   }, [camera, controls, introPosition, introTarget]);
 
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => {
+      reducedMotion.current = preference.matches;
+      if (preference.matches && introActive.current) {
+        introActive.current = false;
+        camera.position.copy(homePosition);
+        controls?.target.copy(homeTarget);
+        controls?.update();
+      }
+    };
+    update();
+    preference.addEventListener('change', update);
+    return () => preference.removeEventListener('change', update);
+  }, [camera, controls, homePosition, homeTarget]);
+
   useFrame((state, delta) => {
     if (!controls) return;
     const store = useExplorerStore.getState();
@@ -76,7 +112,10 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
     // the cinematic reveal and the damping.
     const capture = store.captureRequest;
     if (capture) {
-      camera.position.set(...capture.preset.camera.position);
+      const view = capture.preset.camera;
+      camera.position.set(...(capture.preset.id === 'apartments'
+        ? fitCameraPosition(view.position, view.target, APARTMENTS_VIEW_BOUNDS, aspect)
+        : view.position));
       controls.target.set(...capture.preset.camera.target);
       controls.update();
       return;
@@ -101,7 +140,12 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
         walkRuntime.t = 0;
         setWalkT(0);
       } else {
-        desiredPosition.current.set(...request.position);
+        const preset = [CAMERA_PRESETS.home, CAMERA_PRESETS.apartments, CAMERA_PRESETS.plan].find((view) =>
+          request.position.every((value, axis) => value === view.position[axis]),
+        );
+        desiredPosition.current.set(...(preset
+          ? fitCameraPosition(request.position, request.target, preset === CAMERA_PRESETS.apartments ? APARTMENTS_VIEW_BOUNDS : TOWNSHIP_VIEW_BOUNDS, aspect)
+          : request.position));
         desiredTarget.current.set(...request.target);
         transitioning.current = true;
       }
@@ -136,7 +180,7 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
       const nextZ = THREE.MathUtils.clamp(
         controls.target.z + direction.z,
         SITE.minZ - 70,
-        SITE.maxZ + 70,
+        DISTRICT_BOUNDS.maxZ + 40,
       );
       const offset = new THREE.Vector3(nextX - controls.target.x, 0, nextZ - controls.target.z);
 
@@ -167,7 +211,7 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
     }
 
     if (transitioning.current) {
-      const k = 1 - Math.pow(0.0018, delta);
+      const k = reducedMotion.current ? 1 : 1 - Math.pow(0.0018, delta);
       camera.position.lerp(desiredPosition.current, k);
       controls.target.lerp(desiredTarget.current, k);
       if (
@@ -176,7 +220,7 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
       ) {
         transitioning.current = false;
       }
-    } else if (variant === 'hero') {
+    } else if (variant === 'hero' && !reducedMotion.current) {
       // A slow, continuous drift keeps the hero frame alive without stealing
       // attention from the headline.
       driftOffset.current.copy(camera.position).sub(controls.target);
@@ -195,7 +239,7 @@ export default function CameraRig({ variant = 'explorer', introDuration }: Props
     controls.target.z = THREE.MathUtils.clamp(
       controls.target.z,
       SITE.minZ - margin,
-      SITE.maxZ + margin,
+      DISTRICT_BOUNDS.maxZ + 40,
     );
     controls.update();
   });

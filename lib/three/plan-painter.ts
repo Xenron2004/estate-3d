@@ -1,15 +1,16 @@
 import { GREEN, PLOTS, ROADS, SITE } from '../data/township';
 import { mulberry32 } from './assets';
+import { createParkTrail } from './park-trail';
 
 /** World rectangle covered by the painted master-plan texture. */
 export const PLAN = { minX: -125, maxX: 125, minZ: -4, maxZ: 198 };
 
 const EARTH = '#c3b69a';
 const EARTH_DARK = '#ab9e83';
-const SCRUB = '#8d8a63';
-const LAWN = '#87995f';
-const LAWN_LIGHT = '#96a86c';
-const LAWN_DARK = '#728550';
+const SCRUB = '#8d9867';
+const LAWN = '#789850';
+const LAWN_LIGHT = '#91aa65';
+const LAWN_DARK = '#648546';
 const ASPHALT = '#3c3c39';
 const ASPHALT_WORN = '#474742';
 const KERB = '#b3ac9c';
@@ -287,10 +288,10 @@ export function paintSitePlan(ctx: CanvasRenderingContext2D, W: number, H: numbe
   ctx.lineWidth = R(2.2);
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(X(-26), Z(126));
-  ctx.bezierCurveTo(X(-34), Z(146), X(-20), Z(166), X(-4), Z(176));
-  ctx.bezierCurveTo(X(16), Z(184), X(32), Z(168), X(28), Z(146));
-  ctx.bezierCurveTo(X(25), Z(132), X(12), Z(124), X(-4), Z(122));
+  createParkTrail(0).getPoints(160).forEach((point, index) => {
+    if (index === 0) ctx.moveTo(X(point.x), Z(point.z));
+    else ctx.lineTo(X(point.x), Z(point.z));
+  });
   ctx.closePath();
   ctx.stroke();
   ctx.restore();
@@ -363,7 +364,7 @@ export function paintSitePlan(ctx: CanvasRenderingContext2D, W: number, H: numbe
 /** Tileable field/dirt texture used for the terrain beyond the site. */
 export function paintTerrain(ctx: CanvasRenderingContext2D, size: number) {
   const random = mulberry32(7788);
-  ctx.fillStyle = '#a79a78';
+  ctx.fillStyle = '#929a70';
   ctx.fillRect(0, 0, size, size);
 
   const fields = 16;
@@ -372,7 +373,7 @@ export function paintTerrain(ctx: CanvasRenderingContext2D, size: number) {
     const h = size * (0.12 + random() * 0.26);
     const x = random() * size;
     const y = random() * size;
-    const tones = ['#9aa071', '#b6a882', '#8d8f5e', '#c0b08a', '#8a8b62', '#a8a06f'];
+    const tones = ['#879b69', '#a8a47c', '#768957', '#b6ad87', '#81945f', '#98a373'];
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate((random() - 0.5) * 0.3);

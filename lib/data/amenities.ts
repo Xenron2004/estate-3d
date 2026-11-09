@@ -1,7 +1,40 @@
 import type { Amenity, GalleryPreset } from '../types';
 import { MASTER_PLAN_STATS } from './township';
+import { CAMERA_PRESETS } from '../camera';
 
 export const AMENITIES: Amenity[] = [
+  {
+    id: 'apartments',
+    name: 'The Modern Residences',
+    category: 'landmark',
+    x: 0,
+    z: 235,
+    summary: 'Five new apartment buildings with white and charcoal facades, full-height windows and planted roof terraces.',
+    detail:
+      'The northern residential extension connects to the township through a landscaped arrival street. Five distinct apartment blocks frame shared gardens and parking, with recessed balconies, charcoal window frames, glazed entrance lobbies, stepped upper floors and planted terraces inspired by contemporary urban residences.',
+    camera: CAMERA_PRESETS.apartments,
+    facts: [
+      { label: 'New buildings', value: '5 apartment blocks' },
+      { label: 'Architecture', value: 'White + charcoal facades' },
+      { label: 'Landscape', value: 'Roof terraces + shared gardens' },
+    ],
+  },
+  {
+    id: 'pavilion',
+    name: 'The Garden Pavilion',
+    category: 'leisure',
+    x: -22,
+    z: 159,
+    summary: 'A glass-fronted conservatory and cafe with a shaded garden terrace in Central Park.',
+    detail:
+      'A new neighbourhood gathering place at the north-west corner of the park. A pitched conservatory roof, warm timber frames and tall glazed openings look onto a planted terrace, with outdoor tables and a sheltered pergola. Follow the park loop to its front door.',
+    camera: { position: [-47, 15, 139], target: [-22, 3.2, 167] },
+    facts: [
+      { label: 'Building', value: 'Conservatory + cafe' },
+      { label: 'Setting', value: 'Central Park garden' },
+      { label: 'Outdoor space', value: 'Shaded dining terrace' },
+    ],
+  },
   {
     id: 'entrance',
     name: 'Gated Main Entrance',
@@ -138,6 +171,13 @@ export const AMENITY_BY_ID: Record<string, Amenity> = Object.fromEntries(
 
 export const GALLERY_PRESETS: GalleryPreset[] = [
   {
+    id: 'apartments',
+    title: 'The Modern Residences',
+    caption: 'Five new contemporary apartment blocks, glazed lobbies and planted roof terraces.',
+    camera: CAMERA_PRESETS.apartments,
+    timeOfDay: 'day',
+  },
+  {
     id: 'aerial',
     title: 'Aurelia from the air',
     caption: 'The full 50-plot master plan, entrance to northern park.',
@@ -167,10 +207,10 @@ export const GALLERY_PRESETS: GalleryPreset[] = [
   },
   {
     id: 'parcel',
-    title: 'A single parcel',
-    caption: 'Plot A-05 — green belt frontage on the Avenue.',
-    camera: { position: [-38, 26, 44], target: [-43, 1, 48] },
-    timeOfDay: 'day',
+    title: 'The Garden Pavilion',
+    caption: 'The new conservatory cafe, its timber pergola and planted garden terrace.',
+    camera: { position: [-47, 15, 139], target: [-22, 3.2, 167] },
+    timeOfDay: 'golden',
   },
   {
     id: 'golden',

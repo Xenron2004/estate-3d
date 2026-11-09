@@ -22,8 +22,8 @@ export default function Page() {
       <main id="top">
         <Hero />
         <Introduction />
-        <MasterPlan />
         <Highlights />
+        <MasterPlan />
         <AmenitiesLifestyle />
         <AvailablePlots />
         <LocationConnectivity />

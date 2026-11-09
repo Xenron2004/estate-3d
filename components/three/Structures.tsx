@@ -4,40 +4,38 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import Instances, { type InstanceDef } from './Instances';
 import { GREEN, SITE } from '@/lib/data/township';
+import { useExplorerStore } from '@/lib/store';
 
 export default function Structures({ quality }: { quality: 'high' | 'low' }) {
+  const dusk = useExplorerStore((state) => state.timeOfDay === 'dusk');
   const box = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
-  const cylinder = useMemo(() => new THREE.CylinderGeometry(1, 1, 1, 12), []);
-
   const concrete = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#c4bcaa', roughness: 0.92, metalness: 0 }),
+    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.92, metalness: 0 }),
     [],
   );
   const plaster = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#e4dccb', roughness: 0.85, metalness: 0 }),
-    [],
-  );
-  const dark = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#39403b', roughness: 0.6, metalness: 0.15 }),
+    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.82, metalness: 0 }),
     [],
   );
   const glass = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
-        color: '#22333a',
-        roughness: 0.18,
-        metalness: 0.55,
-        transparent: true,
-        opacity: 0.85,
+      new THREE.MeshPhysicalMaterial({
+        color: dusk ? '#ffd7a0' : '#ffffff',
+        roughness: 0.16,
+        metalness: 0.18,
+        clearcoat: 1,
+        envMapIntensity: 1.5,
+        emissive: '#ffc47d',
+        emissiveIntensity: dusk ? 0.65 : 0,
       }),
-    [],
+    [dusk],
   );
   const metal = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#7c7468', roughness: 0.45, metalness: 0.6 }),
+    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.45, metalness: 0.35 }),
     [],
   );
-  const roof = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#b8b0a0', roughness: 0.9, metalness: 0 }),
+  const wood = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.73 }),
     [],
   );
 
@@ -84,7 +82,7 @@ export default function Structures({ quality }: { quality: 'high' | 'low' }) {
     };
 
     run('x', wallZ0, -wallX, wallX, [-7, 7]);
-    run('x', wallZ1, -wallX, wallX, null);
+    run('x', wallZ1, -wallX, wallX, [-7, 7]);
     run('z', -wallX, wallZ0, wallZ1, null);
     run('z', wallX, wallZ0, wallZ1, null);
     return items;
@@ -158,11 +156,44 @@ export default function Structures({ quality }: { quality: 'high' | 'low' }) {
     items.push({ position: [cx, 2.5, minZ - 0.08], scale: [maxX - minX - 6, 2.4, 0.16], color: '#22333a' });
     // east elevation
     items.push({ position: [maxX + 0.08, 2.5, (minZ + maxZ) / 2], scale: [0.16, 2.4, maxZ - minZ - 7], color: '#22333a' });
-    // veranda slab + posts
-    items.push({ position: [cx, 3.05, minZ - 3.4], scale: [maxX - minX - 4, 0.22, 6.4], color: '#cfc6b3' });
+    return items;
+  }, []);
+
+  const facade = useMemo(() => {
+    const { minX, maxX, minZ, maxZ } = GREEN.clubhouse;
+    const items: InstanceDef[] = [];
+    // Deep mullions, window sills, and a shaded timber veranda give the facade depth.
+    for (let x = minX + 3; x <= maxX - 3; x += 2.6) {
+      items.push({ position: [x, 2.5, minZ - 0.22], scale: [0.13, 2.65, 0.22], color: '#e8dfc9' });
+    }
+    for (const y of [1.23, 3.75]) {
+      items.push({ position: [0, y, minZ - 0.2], scale: [26.4, 0.16, 0.35], color: '#f0e5d0' });
+      items.push({ position: [maxX + 0.2, y, (minZ + maxZ) / 2], scale: [0.35, 0.16, 13.4], color: '#f0e5d0' });
+    }
+    for (let z = minZ + 3.5; z <= maxZ - 3.5; z += 2.2) {
+      items.push({ position: [maxX + 0.2, 2.5, z], scale: [0.22, 2.65, 0.13], color: '#eee2cc' });
+    }
+    items.push({ position: [0, 3.35, minZ - 3.3], scale: [28.6, 0.24, 6.7], color: '#ad7952' });
     for (let i = 0; i < 6; i += 1) {
       const x = minX + 3 + i * ((maxX - minX - 6) / 5);
-      items.push({ position: [x, 1.5, minZ - 6.1], scale: [0.3, 3, 0.3], color: '#d6cdb9' });
+      items.push({ position: [x, 1.65, minZ - 6.1], scale: [0.26, 3.3, 0.26], color: '#9b6c49' });
+    }
+    for (let x = -13; x <= 13; x += 1.1) {
+      items.push({ position: [x, 3.17, minZ - 3.3], scale: [0.16, 0.12, 6.6], color: '#d2aa76' });
+    }
+    // Timber fins on the north wall and a planted roof terrace pergola.
+    for (let x = -13; x <= 13; x += 0.65) {
+      items.push({ position: [x, 2.2, maxZ + 0.14], scale: [0.16, 3.5, 0.3], color: x < 0 ? '#b38b60' : '#c59d6f' });
+    }
+    for (const x of [-10, 10]) {
+      for (const z of [48, 57]) items.push({ position: [x, 6.2, z], scale: [0.2, 2.5, 0.2], color: '#9c7550' });
+    }
+    for (let x = -11; x <= 11; x += 1) {
+      items.push({ position: [x, 7.5, 52.5], scale: [0.16, 0.18, 11], color: '#b79361' });
+    }
+    for (const x of [-11.5, 11.5]) {
+      items.push({ position: [x, 5.35, 59], scale: [5, 0.8, 1.2], color: '#d2c5ae' });
+      items.push({ position: [x, 5.82, 59], scale: [4.7, 0.5, 0.85], color: '#647e45' });
     }
     return items;
   }, []);
@@ -217,6 +248,7 @@ export default function Structures({ quality }: { quality: 'high' | 'low' }) {
       <Instances geometry={box} material={concrete} items={gate} castShadow={quality === 'high'} receiveShadow />
       <Instances geometry={box} material={plaster} items={clubhouse} castShadow={quality === 'high'} receiveShadow />
       <Instances geometry={box} material={glass} items={clubGlazing} />
+      <Instances geometry={box} material={wood} items={facade} castShadow={quality === 'high'} receiveShadow interactive={false} />
       <Instances geometry={box} material={metal} items={play} castShadow={quality === 'high'} receiveShadow />
       <Instances geometry={box} material={plaster} items={gazebo} castShadow={quality === 'high'} />
 
