@@ -175,6 +175,7 @@ export default function TownshipCanvas({ variant, quality, className }: Props) {
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 1.02;
+          gl.shadowMap.type = THREE.PCFSoftShadowMap;
         }}
       >
         <PerformanceMonitor

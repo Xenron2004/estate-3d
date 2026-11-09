@@ -138,11 +138,23 @@ export default function Planting({ quality }: { quality: 'high' | 'low' }) {
       scale: [0.42 * tree.scale, 4.4 * tree.scale, 0.42 * tree.scale],
       color: '#6b5540',
     }));
-    const canopyItems: InstanceDef[] = trees.map((tree) => ({
-      position: [tree.x, (4.3 + 1.5 * tree.scale) * tree.scale, tree.z],
-      scale: [2.6 * tree.scale, 2.9 * tree.scale, 2.6 * tree.scale],
-      color: tree.tone,
-    }));
+    const canopyItems: InstanceDef[] = [];
+    trees.forEach((tree) => {
+      const crownY = (4.3 + 1.5 * tree.scale) * tree.scale;
+      const highlight = new THREE.Color(tree.tone).lerp(new THREE.Color('#b6c980'), 0.18);
+      canopyItems.push({
+        position: [tree.x, crownY, tree.z],
+        scale: [2.35 * tree.scale, 2.55 * tree.scale, 2.35 * tree.scale],
+        color: tree.tone,
+      });
+      for (const [x, z] of [[-1, 0.25], [1, -0.2]] as const) {
+        canopyItems.push({
+          position: [tree.x + x * tree.scale, crownY - 0.32 * tree.scale, tree.z + z * tree.scale],
+          scale: [1.65 * tree.scale, 1.75 * tree.scale, 1.65 * tree.scale],
+          color: `#${highlight.getHexString()}`,
+        });
+      }
+    });
 
     const palmTrunks: InstanceDef[] = palmTrees.map((palm) => ({
       position: [palm.x, 4.4 * palm.scale, palm.z],
@@ -176,9 +188,9 @@ export default function Planting({ quality }: { quality: 'high' | 'low' }) {
     };
   }, [density]);
 
-  const trunkGeometry = useMemo(() => new THREE.CylinderGeometry(0.42, 0.56, 1, 7), []);
-  const canopyGeometry = useMemo(() => new THREE.IcosahedronGeometry(1, 1), []);
-  const shrubGeometry = useMemo(() => new THREE.IcosahedronGeometry(1, 0), []);
+  const trunkGeometry = useMemo(() => new THREE.CylinderGeometry(0.42, 0.56, 1, 10), []);
+  const canopyGeometry = useMemo(() => new THREE.SphereGeometry(1, 14, 12), []);
+  const shrubGeometry = useMemo(() => new THREE.SphereGeometry(1, 10, 8), []);
   const boxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const palmGeometry = useMemo(() => new THREE.ConeGeometry(1, 1, 5, 1, true), []);
 
@@ -187,7 +199,7 @@ export default function Planting({ quality }: { quality: 'high' | 'low' }) {
     [],
   );
   const canopyMaterial = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.88, flatShading: true }),
+    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.94 }),
     [],
   );
   const palmMaterial = useMemo(
@@ -200,7 +212,7 @@ export default function Planting({ quality }: { quality: 'high' | 'low' }) {
     [],
   );
   const shrubMaterial = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.9, flatShading: true }),
+    () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.94 }),
     [],
   );
 

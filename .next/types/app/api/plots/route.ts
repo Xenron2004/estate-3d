@@ -1,4 +1,4 @@
-// File: C:\Users\kaush\Downloads\agon-agent_1-4fc2b39f\app\api\plots\route.ts
+// File: C:\Users\kaush\Downloads\real-estate-3d\app\api\plots\route.ts
 import * as entry from '../../../../../app/api/plots/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import Instances, { type InstanceDef } from './Instances';
 
 const TOWERS = [
@@ -19,7 +20,7 @@ const TOWER_WIDTH = 11.8;
 const TOWER_DEPTH = 15.4;
 
 function ApartmentBuildings() {
-  const box = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+  const box = useMemo(() => new RoundedBoxGeometry(1, 1, 1, 2, 0.035), []);
 
   const { walls, trim, windows, balconies, rails, roofs, entries } = useMemo(() => {
     const walls: InstanceDef[] = [];

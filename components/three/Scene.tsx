@@ -16,6 +16,7 @@ import AmenityHotspots from './AmenityHotspots';
 import HousePreview from './HousePreview';
 import CameraRig from './CameraRig';
 import ApartmentSociety from './ApartmentSociety';
+import AnimatedLife from './AnimatedLife';
 import type { Plot } from '@/lib/types';
 
 function Exposure({ value }: { value: number }) {
@@ -55,7 +56,8 @@ export default function Scene({
     if (!lightRef.current) return;
     lightRef.current.target = lightTarget;
     lightRef.current.target.updateMatrixWorld();
-  }, [lightTarget]);
+    lightRef.current.shadow.radius = quality === 'high' ? 5 : 2;
+  }, [lightTarget, quality]);
 
   return (
     <>
@@ -71,6 +73,7 @@ export default function Scene({
       <Exposure value={lighting.exposure} />
 
       <hemisphereLight args={[lighting.skyColor, lighting.groundColor, lighting.hemiIntensity]} />
+      <ambientLight color={lighting.skyColor} intensity={0.16} />
       <primitive object={lightTarget} />
       <directionalLight
         ref={lightRef}
@@ -97,6 +100,7 @@ export default function Scene({
       <Structures quality={quality} />
       <Planting quality={quality} />
       <StreetFurniture quality={quality} timeOfDay={timeOfDay} />
+      <AnimatedLife quality={quality} />
       <AmenityHotspots />
       <HousePreview />
       <CameraRig variant={variant} />
